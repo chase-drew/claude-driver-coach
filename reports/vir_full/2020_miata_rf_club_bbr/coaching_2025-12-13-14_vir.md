@@ -41,9 +41,9 @@ Cold dry both days, similar to Nov. Day 2's **30 km/h NW wind is the big new var
 
 ## Day-by-Day
 
-**Day 1** (20 on-pace, 4.501 s std dev). 4 segments separated by cool-down breaks of 188 s, 280 s, 518 s, 181 s. Came competitive by L11 (2:20.869) and set the day's best at L12 (2:18.019) — already 0.869 s faster than Nov's weekend best. The S2 segment after the longest break (518 s) produced multiple sub-2:21s, suggesting the long cool-down didn't hurt re-warmup as much as expected.
+**Day 1** (20 on-pace, 4.501 s std dev). Came competitive by L11 (2:20.869) and set the day's best at L12 (2:18.019) — already 0.869 s faster than Nov's weekend best. The fastest cluster (L11, L12, L19, L21) shows consistent sub-2:21 pace once the tires were working.
 
-**Day 2** (16 on-pace, 3.644 s std dev). 5 segments with cool-down breaks of 125 s, 222 s, 154 s, 181 s, 127 s. The big anomaly: L7 (3:50.250) and L8 (3:57.226) — both ~4 min lap times in segment S1 immediately after a cool-down break, with abnormally low top speeds (76 mph). Almost certainly a yellow-flag stint. The fast window came in S3 (L18–L26): four sub-2:19s including the weekend best L24 (2:17.884). Day 2's wind hurt straight-line speed but didn't affect cornering — every lateral-grip corner gained.
+**Day 2** (16 on-pace, 3.644 s std dev). L7 (3:50.250) and L8 (3:57.226) — both ~4 min lap times with abnormally low top speeds (76 mph) — are almost certainly a yellow-flag stint and correctly flagged off-pace. The fast window came late in the session: four sub-2:19s from L19 to L26 including the weekend best L24 (2:17.884). Day 2's wind hurt straight-line speed but didn't affect cornering — every lateral-grip corner gained.
 
 ---
 
