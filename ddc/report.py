@@ -160,15 +160,16 @@ def _render_session_report(
         lines.append(meta.notes)
         lines.append("")
 
-    # ---- Session segments (paddock / pit cool-down breaks) --------------------
+    # ---- Session segments (cool-down breaks) ---------------------------------
     segment_breaks = [l for l in laps if l.segment_break_after]
     n_segments = max((l.segment_id for l in laps), default=0) + 1
     if segment_breaks:
         lines.append("## Session segments")
         lines.append("")
         lines.append(
-            f"This session has **{n_segments} segments** separated by {len(segment_breaks)} paddock/pit cool-down break(s). "
-            "A new segment means the car was stationary long enough that tires and brake pads cooled — treat the first 2–3 laps of each segment as warm-up, not technique signal. **Gap durations are in seconds.**"
+            f"This session has **{n_segments} segments** separated by {len(segment_breaks)} cool-down break(s) "
+            "(car stationary somewhere — telemetry can't tell pit lane vs hot pit vs paddock). "
+            "A new segment means the tires and brake pads had time to cool — treat the first 2–3 laps of each segment as warm-up, not technique signal. **Durations are in seconds.**"
         )
         lines.append("")
         lines.append("| Segment | Laps in segment | Break ends on lap | Stationary gap |")
@@ -190,7 +191,7 @@ def _render_session_report(
     # ---- Lap summary table ----------------------------------------------------
     lines.append("## Lap summary")
     lines.append("")
-    lines.append("On-pace = lap kept for analysis (not an in/out lap, not a structural outlier, not a paddock/pit break, not >5% off median pace). Long laps that are paddock breaks show the stationary gap in seconds; the lap-time column would mislead.")
+    lines.append("On-pace = lap kept for analysis (not an in/out lap, not a structural outlier, not a cool-down break, not >5% off median pace). Long laps that are cool-down breaks show the stationary duration in seconds; the lap-time column would mislead.")
     lines.append("")
     lines.append("| Lap # | Seg | Lap time | Δ vs best | Distance (m) | Avg mph | Max mph | Status |")
     lines.append("|---|---|---|---|---|---|---|---|")
@@ -689,7 +690,7 @@ def _render_weekend_report(track: TrackRef, car: CarRef, weekend_id: str, digest
         )
     lines.append("")
 
-    # ---- Inter-session gaps (paddock time between CSVs) ----------------------
+    # ---- Inter-session gaps (between-session time between CSVs) --------------
     sorted_digests = sorted(digests, key=lambda d: d.meta.start_time_utc or "")
     inter_gaps: list[tuple[_SessionDigest, _SessionDigest, float]] = []
     for prev, curr in zip(sorted_digests, sorted_digests[1:], strict=False):
@@ -703,7 +704,7 @@ def _render_weekend_report(track: TrackRef, car: CarRef, weekend_id: str, digest
         except (ValueError, AttributeError):
             continue
     if inter_gaps:
-        lines.append("## Between-session gaps (paddock / overnight time)")
+        lines.append("## Between-session gaps (overnight / between-stint time)")
         lines.append("")
         lines.append("Time the car sat between successive imported CSVs. Each gap is a full cold-start for the next session. **Durations are in seconds.**")
         lines.append("")

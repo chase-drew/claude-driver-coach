@@ -32,7 +32,7 @@ class Lap:
     incomplete: bool = False         # last-lap-of-file with no next-crossing
     outlier: bool = False            # off-pace / incident / in-out lap
     outlier_reasons: list[str] = field(default_factory=list)
-    segment_id: int = 0              # 0-based segment number; increments after each paddock/pit break
+    segment_id: int = 0              # 0-based segment number; increments after each cool-down break
     segment_break_after: bool = False  # True if a long stationary gap occurred during this lap
     segment_break_duration_s: float = 0.0  # estimated stationary time inside this lap (seconds)
 
@@ -159,7 +159,7 @@ def _finalize_lap(df: pd.DataFrame, lap_number: int, row_start: int, row_end: in
     )
 
 
-SEGMENT_BREAK_THRESHOLD_S = 240.0  # lap time > this and roughly normal distance → paddock/pit cool-down break
+SEGMENT_BREAK_THRESHOLD_S = 240.0  # lap time > this and roughly normal distance → in-pit cool-down break (car stationary)
 
 
 def classify_outliers(
@@ -183,8 +183,9 @@ def classify_outliers(
       - **Lap time > ``segment_break_threshold_s`` AND distance within ±tolerance →
         outlier ``segment_break (Xs)``** where X is the estimated stationary time
         in **seconds** (the lap time minus the median on-pace lap time). This is a
-        paddock or pit cool-down break; the next lap is treated as the start of a
-        new segment. The lap that *contains* the break has ``segment_break_after =
+        cool-down break (car stationary somewhere — pit lane, hot pit, or back at
+        the paddock — telemetry can't tell); the next lap is treated as the start
+        of a new segment. The lap that *contains* the break has ``segment_break_after =
         True``, and all subsequent laps have ``segment_id`` incremented by 1.
       - With ≥ ``min_pace_sample`` other "candidate-clean" laps in the same
         session: lap time > median * (1 + ``pace_pct_off_median``) → outlier
@@ -216,7 +217,7 @@ def classify_outliers(
         lap.outlier = bool(reasons)
 
     # Second pass: segment-break detection. A lap with a very long time and roughly
-    # normal distance means the car was stationary for most of it (paddock / pit break).
+    # normal distance means the car was stationary for most of it (cool-down break).
     # We use the median on-pace lap time as the "expected" lap duration and call the
     # excess time the stationary gap.
     clean_times_for_median = [

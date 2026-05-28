@@ -26,13 +26,13 @@ Both days started cold and overcast. Day 2 was 3.5 °C warmer with rubber laid d
 |---|---|---|---|
 | **Best lap** | 2:21.439 (L24) | **2:18.888 (L27)** | **2:18.888** |
 | Theoretical optimal | 2:20.533 | 2:16.642 | **2:17.378** |
-| Time left on best | +906 ms | +2,246 ms | **+1,510 ms** |
+| Time left on best | +0.906 s | +2.246 s | **+1.510 s** |
 | On-pace / total laps | 17 / 26 | 19 / 32 | 36 / 58 |
 | Std dev (on-pace) | 5.568 s | 5.036 s | — |
 | Top speed (best) | 120.3 mph | 121.5 mph | — |
 | **CAN-bus dropout laps** | 4 (incl. L24★) | 0 (+2 partial: L14, L20) | 4 |
 
-**Headline.** Weekend best 2:18.888 on D2 L27, with 1.51 s of theoretical room. **58% of that gap (880 ms) lives in two front-straight sectors — S1 T1 entry (+448 ms) and S10 Front Straight (+432 ms) — and both reference D2 L14.** That's not two problems; it's one repeatable front-straight speed difference traceable to a single technique change at T17 (see Hog Pen analysis below).
+**Headline.** Weekend best 2:18.888 on D2 L27, with 1.510 s of theoretical room. **58% of that gap (0.880 s) lives in two front-straight sectors — S1 T1 entry (+0.448 s) and S10 Front Straight (+0.432 s) — and both reference D2 L14.** That's not two problems; it's one repeatable front-straight speed difference traceable to a single technique change at T17 (see Hog Pen analysis below).
 
 > **Data caveats:** Day 1 L24 (best lap) has CAN dropout — lap time and sectors valid, no pedal data. Day 1 technique reference = L13 (2:26.398). On Day 2, L14 and L20 show physically impossible pedal % values (signal anomalies); their GPS/sector data is valid (correctly used in the optimal calculation), but ignore their pedal stats for technique analysis.
 
@@ -150,26 +150,26 @@ The 44 m trail-brake-past-apex pattern is repeated across all top laps — that'
 
 ## How the Front-Straight Deficit Ties Together
 
-The S10 (+432 ms) and S1 (+448 ms) deficits are not two separate problems — they're one technique change at T17:
+The S10 (+0.432 s) and S1 (+0.448 s) deficits are not two separate problems — they're one technique change at T17:
 
 1. **L27 was at 51% throttle at T17 apex** (vs 99–100% on three other laps).
 2. Lower throttle through Hog Pen → lower T17a exit speed.
-3. Lower exit speed compounds across the 700 m front straight → **−432 ms S10**.
-4. Lower top-of-front-straight speed → slower into T1 brake zone → **−448 ms S1**.
+3. Lower exit speed compounds across the 700 m front straight → **−0.432 s S10**.
+4. Lower top-of-front-straight speed → slower into T1 brake zone → **−0.448 s S1**.
 
-**One technique change at T17 = ~880 ms recovered.** This is the highest-leverage single change available on this weekend's data.
+**One technique change at T17 ≈ 0.880 s recovered.** This is the highest-leverage single change available on this weekend's data.
 
 ---
 
 ## Improvement Targets — Next Session
 
-### 1. Commit to full throttle at T17 apex (Target: ~880 ms across S10 + S1)
+### 1. Commit to full throttle at T17 apex (Target: ~0.880 s across S10 + S1)
 L27 → 51% throttle + 22% brake at T17 apex. Reference: **L23 ran 100% throttle, 0% brake, 67.6 mph apex** (nearly identical apex speed, completely different commitment). L31 hit 1.30 lat G at T17 — grip is there. Three laps did it; do it on the clean lap.
 
-### 2. Hold more throttle through T11 Oak Tree apex (Target: 100–150 ms in S6)
+### 2. Hold more throttle through T11 Oak Tree apex (Target: 0.100–0.150 s in S6)
 L27 → 60% throttle, 0% brake, 51.8 mph min (highest of any lap). L13 and L14 held **100% throttle** through T11 apex. The 0%-brake entry technique is correct — the gain is in not lifting at the apex itself.
 
-### 3. Replicate L26's S5 South Bend line (Target: 220 ms in S5)
+### 3. Replicate L26's S5 South Bend line (Target: 0.220 s in S5)
 L26 (2:22.431, +3.5 s overall) ran S5 in **13.320 s** vs L27's 13.540 s. Slower overall lap, faster sector — the line/min-speed combination exists. Worth a side-by-side review of L26's T10 entry on the next session.
 
 ---
