@@ -1,192 +1,218 @@
-# VIR Full Course — March 7–8, 2026
+# 2026-03-07-08 VIR Full — Weekend Coaching Report
 
-**Tires:** **Hankook Ventus RS4** 225/45R17, 4–6 heat cycles (fresh set, brand switch from Nankang CR-S)
-**Car:** 2020 Mazda Miata RF Club, BBR tune
-**Source files:** `session_20260307_1447_vir_full_v3.csv` (D1), `session_20260308_1001_vir_full_v3.csv` (D2)
-**Compared to:** `2025-12-13-14_vir` (Nankang CR-S, 6–10 cycles, cold dry) and `2025-11-29-30_vir` (Nankang CR-S, 4–7 cycles, cold dry)
+**Event:** Virginia International Raceway — Full Course
+**Dates:** March 7–8, 2026 (2-day HPDE)
+**Car:** 2020 Mazda MX-5 RF — Club, BBR
+**Tires:** Hankook Ventus RS4, 225/45R17, ~4–6 cycles (**fresh set, brand switch from Nankang CR-S**)
+**Setup note:** Front sway bar, rear bar delete, alignment all revised vs prior weekends.
 
 ---
 
-## Conditions
+## Confounders — re-baseline weekend, not like-for-like vs Nov/Dec
 
-| | Day 1 — Sat Mar 7 | Day 2 — Sun Mar 8 |
-|---|---|---|
-| Air temp (session start) | 24.8 °C / 77 °F | 19.7 °C / 67 °F |
-| Humidity | 58% | **75%** |
-| Cloud / precip | 40% cloud, dry | **99% cloud, dry** |
-| Wind | 16.2 mph @ 210° (SW) | 11.8 mph @ 234° (SW) |
+- **Tire compound switched** (Nankang CR-S → fresh Hankook RS4) — different grip envelope, warm-up, optimal slip-angle.
+- **Suspension + alignment revised** — different balance; trail-brake and on-throttle understeer feel will differ from Dec.
+- **Temperature swing** — Sunday 66°F vs Dec's 38°F (Sat weather unavailable). Sat was afternoon; Sun morning.
 
-**Two big changes vs every prior weekend.** Conditions: 68–77 °F vs Nov/Dec's 31–38 °F — a 36 °F jump. Tire: switched from Nankang CR-S (the only compound the series had data on) to Hankook Ventus RS4 with only 4–6 heat cycles on it. **Treat almost every per-corner delta vs prior weekends as some mix of tire-compound transition and driver learning — not technique regression.**
-
-Day 1 was a late-afternoon session (14:47 start). Day 2 was the cooler, cloudier, more humid morning session — and the faster day, suggesting either the tires preferred the cooler air or the rubber from Day 1 helped.
+Cross-weekend deltas below are still useful, but the headline regression is expected — not a technique failure.
 
 ---
 
 ## Top-Line Numbers
 
-| Metric | Day 1 | Day 2 | Weekend | Δ vs Dec | Δ vs Nov |
+| Metric | Value | Source |
+|---|---|---|
+| Weekend best lap | **2:21.408** | L20 @ 2026-03-08 (Sun) |
+| Weekend optimum | 2:19.877 | sum of sector bests below |
+| Gap to weekend optimum | +1.531s | — |
+| Best vs prior weekend (Dec 13–14) | **+3.524s** vs 2:17.884 | prior 2025-12-14 |
+| Optimum vs series-best optimum | +3.185s vs 2:16.692 | owned by Dec 2025 |
+| Sat best (across 2 on-track sessions) | 2:22.986 | L12 @ 2026-03-07 (in Sat-2) |
+| Sun best (across 3 on-track sessions) | **2:21.408** | L20 @ 2026-03-08 (in Sun-2) |
+
+The 3.524s regression vs Dec is real but expected — the car is fundamentally different (compound + suspension + alignment). The relevant question this weekend is *not* "why slower than Dec" but **"what does the new setup ask of the driver that the old setup didn't"** — answered in the per-corner section below.
+
+---
+
+## Per-Session Breakdown
+
+### Saturday Mar 7 — 2 on-track sessions (afternoon start)
+
+| Session | Laps in session | Fast lap | Time | Fast lap arrived at |
+|---|---|---|---|---|
+| Sat-1 | L1–L9 | L7 | 2:24.796 | 5 of 7 |
+| Sat-2 | L10–L19 | **L12** | **2:22.986** ★ | 3 of 9 |
+
+Only 2 sessions Saturday (afternoon-only event). Sat-2 best landed at L12 — third lap into the session, suggesting tires/brakes came up quickly. Saturday's all-day best (2:22.986) is the re-acclimation pace on the new setup.
+
+### Sunday Mar 8 — 3 on-track sessions (morning start)
+
+| Session | Laps in session | Fast lap | Time | Fast lap arrived at |
+|---|---|---|---|---|
+| Sun-1 | L1–L8 | L5 | 2:22.632 | 5 of 7 |
+| Sun-2 | L9–L25 | **L20** | **2:21.408** ★ | 12 of 14 |
+| Sun-3 | L26–L28 | L27 | 2:27.540 | cool-down only |
+
+**Sun-1's best (2:22.632) already matched Saturday's all-day best on the first session of the day** — overnight processing of the new setup paid off. Sun-2 produced the series best at L20 (12th lap into a 14-on-pace session — late, but the session was long). Sun-3 was a 1-lap cool-down stint.
+
+---
+
+## Sector Analysis — vs prior weekend (Dec 13–14)
+
+| # | Sector | Mar (s) | Dec (s) | Δ s |
+|---|---|---|---|---|
+| 1 | T1 | 14.719 | 14.201 | +0.518 |
+| 2 | NASCAR | 16.668 | 16.401 | +0.267 |
+| 3 | Snake | 9.459 | 9.084 | +0.375 |
+| 4 | Esses | 19.854 | 19.100 | **+0.754** |
+| 5 | South Bend | 13.320 | 13.080 | +0.240 |
+| 6 | Oak Tree | 3.862 | 3.656 | +0.206 |
+| 7 | Back Straight | 29.535 | 29.127 | +0.408 |
+| 8 | Roller Coaster | 6.649 | 6.573 | +0.076 |
+| 9 | Hog Pen | 12.179 | 11.889 | +0.290 |
+| 10 | Front Straight | 13.632 | 13.581 | +0.051 |
+
+**Every sector regressed.** The biggest losses cluster in the high-speed lateral-grip sectors — **S4 Esses (+0.754s)** alone accounts for nearly a quarter of the lap-time regression. S3 Snake and S7 Back Straight (which is wind-affected on Sunday but also gets carried into by the Esses exit) follow. Slow sectors like S8 Roller Coaster (+0.076s) and S10 Front Straight (+0.051s) lost very little — confirming the regression is a high-speed-grip story, not a brake-zone story.
+
+---
+
+## Ranked Corner Improvement Opportunities
+
+| Turn | This best apex (mph) | All-time best apex (mph) | Δ mph | This lap | All-time source |
 |---|---|---|---|---|---|
-| **Best lap** | 2:22.986 | **2:21.408 (L20)** | **2:21.408** | **+3.524 s** | **+2.520 s** |
-| Theoretical optimal | 2:21.230 | 2:19.512 | **2:19.877** | +3.185 s | +2.499 s |
-| Time left on best | +1.578 s (D1) | +1.896 s (D2) | **+1.531 s** | +0.339 s wider | +0.021 s |
-| On-pace laps | 13 | 19 | 32 | −4 | −4 |
-| Median on-pace | 2:25.723 | 2:25.521 | — | +1.318 s | −7.982 s |
-| Std dev (on-pace) | 1.946 s | **2.323 s** | — | **−1.321 s tighter** | **−3.245 s tighter** |
-| Peak lateral G (best) | 1.27 | 1.28 | — | −0.05 vs Dec | +0.04 vs Nov |
-| Peak braking G (best) | 0.86 | 0.86 | — | −0.22 vs Dec | +0.02 vs Nov |
-| Top speed (best) | 121.4 | 121.1 | — | +0.2 vs Dec | −0.4 vs Nov |
+| 9 | 95.5 | 107.8 | **−12.2** | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 7 | 102.2 | 111.5 | **−9.3** | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 8 | 101.9 | 109.8 | **−7.9** | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 5b | 68.4 | 74.6 | −6.2 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 5a | 53.5 | 59.5 | −5.9 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 11 | 57.2 | 61.7 | −4.5 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 6a | 76.1 | 80.5 | −4.4 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 2 | 61.0 | 64.8 | −3.8 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
+| 1 | 44.5 | 47.5 | −3.0 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 15 | 64.8 | 67.6 | −2.9 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
+| 6b | 86.1 | 88.8 | −2.7 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 14b | 46.7 | 49.1 | −2.4 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 17a | 79.9 | 82.2 | −2.3 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
+| 12 | 42.6 | 44.7 | −2.1 | L20 @ 2026-03-08 | Dec 2025, 2025-12-14 |
+| 13 | 114.9 | 116.2 | −1.3 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
+| 3 | 65.0 | 65.1 | −0.1 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
+| 4 | 50.1 | 50.1 | −0.1 | L20 @ 2026-03-08 | Nov 2025, 2025-11-30 |
 
-**Headline.** Best lap **2:21.408 (D2 L20)** — 3.524 s slower than Dec, 2.520 s slower than Nov. **This is almost entirely a tire transition story, not a technique regression.** The corners that lost the most are exactly the corners where tire grip envelope matters most (Esses, Snake — sustained-lateral-G). The corners that held or gained (South Bend, T17/T17a, T14a) are where the driver's *recent technique changes* from the prior coaching are visible through the tire noise. **One clear positive:** on-pace std dev dropped to 2.323 s — the tightest consistency of any weekend so far, on a brand-new compound. The driver is hitting their (conservative) marks reliably while feeling out the new tire.
-
----
-
-## Day-by-Day
-
-**Day 1** (13 on-pace, 1.946 s std dev). Afternoon session. Best L7 (2:22.986). Only 13 on-pace laps — small sample. Came up to speed quickly given a brand-new tire compound.
-
-**Day 2** (19 on-pace, 2.323 s std dev). Morning. Best L20 (2:21.408). Eight laps within 0.733 s of the best (L5, L13, L18, L19, L20, L21, L22, L18). The 2.323 s std dev is the lowest single-day consistency the driver has produced on any weekend in the series — execution is dialed; the ceiling is constrained.
-
----
-
-## Sector Analysis — Best Lap (D2 L20) vs Weekend Optimum
-
-| # | Sector | Optimum | L20 | Δ | Optimum from |
-|---|---|---|---|---|---|
-| 1 | S1 T1 ★ | 14.719 | 14.719 | 0.000 | L20 D2 |
-| 2 | S2 NASCAR | 16.668 | 16.931 | +0.263 | L18 D1 |
-| 3 | S3 Snake | 9.459 | 9.750 | +0.291 | L21 D2 |
-| 4 | S4 Esses | 19.854 | 20.106 | +0.252 | L13 D2 |
-| 5 | S5 South Bend | 13.320 | 13.494 | +0.174 | L12 D2 |
-| 6 | S6 Oak Tree | 3.862 | 3.982 | +0.120 | L7 D1 |
-| 7 | S7 Back Straight | 29.535 | 29.604 | +0.069 | L14 D1 |
-| 8 | S8 Roller Coaster | 6.649 | 6.877 | +0.228 | L15 D1 |
-| 9 | S9 Hog Pen | 12.179 | 12.262 | +0.083 | L14 D1 |
-| 10 | S10 Front Straight | 13.632 | 13.683 | +0.051 | L10 D2 |
-| | **Total** | **2:19.877** | 2:21.408 | **+1.531** | |
-
-L20 owned only **S1 T1 ★** outright — the front-straight braking sector. Every other sector had a faster lap somewhere in the weekend. The largest gaps: **S3 Snake (+0.291 s), S2 NASCAR (+0.263 s), S4 Esses (+0.252 s), S8 Roller Coaster (+0.228 s)** — all lateral-grip-heavy sectors, all referencing other laps within the weekend. **The internal-weekend gap pattern is the same shape as Dec's** (best lap hits a few sectors, leaves money in the others) — just at a slower absolute pace.
+**Corners at or above all-time-best apex** (the new setup didn't hurt these): T10 (85.5), T16 (76.8), T14a (73.9), T17 (68.8). All slow-to-medium braking corners where the new front bar + alignment may actually be helping turn-in.
 
 ---
 
-## Cross-Weekend — Where the Tire Change Hit
+## Per-Corner Technique Deltas — the actionable findings
 
-vs **Dec 2025** (Nankang CR-S, 6–10 cycles, cold):
+### T9 Esses (apex Δ −12.2 mph) — **gear-up to 5th changed the corner**
 
-| Sector | Δ vs Dec | Δ % | Read |
-|---|---|---|---|
-| S4 Esses | **+0.754** | +3.95% | Worst hit. Lateral-grip sector at 100+ mph. |
-| S1 T1 | +0.518 | +3.65% | Heavy-braking entry. |
-| S7 Back Straight | +0.408 | +1.40% | Straight-line — less tire-dependent. |
-| S3 Snake | +0.375 | +4.13% | Sustained-lateral sector. |
-| S9 Hog Pen | +0.290 | +2.44% | High-G complex. |
-| S2 NASCAR | +0.267 | +1.63% | |
-| S5 South Bend | **+0.240** | +1.83% | But still equals Nov — see below. |
-| S8 Roller Coaster | +0.076 | +1.16% | Smallest hit — interesting given how much grip this sector usually needs. |
-| S10 Front Straight | +0.051 | +0.38% | Negligible — pure straight-line. |
-| S6 Oak Tree | +0.206 | +5.63% | Biggest % hit, smallest absolute. |
+| Metric | This best (L20 @ 2026-03-08) | All-time best (Dec, 2025-12-14) |
+|---|---|---|
+| Apex mph | 95.5 | 107.8 |
+| Gear (entry→apex) | **5→5** | **4→4** |
+| Brake max (%) | 8 | 71 |
+| Trail past apex (m) | 12.8 | 23.0 |
+| Throttle@apex (%) | 41 | 54 |
+| Peak latG | 0.87 | 0.97 |
 
-**Pattern.** The biggest absolute hits (Esses, T1, Back Straight, Snake) are *not* uniformly the highest-lateral-G sectors — they're a mix. But the *percentage* losses are largest in the lower-speed technical sectors (Oak Tree, Snake, Esses). The straight-line / drag-down sectors (Back Straight, Front Straight) lost almost nothing in percentage terms. **This is what a tire-compound switch looks like when the new compound has less peak lateral grip than the old one** — corners scale roughly with grip available; straights don't.
+**Headline finding for the weekend.** You're carrying 5th gear through T9 this weekend, vs 4th gear in Dec. Brake max collapsed from 71% to 8%, trail-past-apex halved, lat G dropped meaningfully. The whole approach to T9 is a different car — you're treating it as a fast cruise corner instead of a trail-braked rotation corner. Whether the new setup *asked* you to do this (front-end loaded differently) or you experimented with the gear is unclear from telemetry alone — **it's the single most important thing to investigate next session.**
 
-**Apex-speed losses (top 5) vs Dec:** T9 Esses **−12.2 mph**, T7 Esses **−9.3 mph**, T8 Esses **−7.9 mph**, T5b Snake **−6.2 mph**, T5a t4_t5a **−5.9 mph**. All in the lateral-grip cluster.
+### T7 / T8 Esses — same pattern, partial 5th-gear shift
 
-**The two stand-out positives vs Dec** (corners that *gained* despite the tire change):
+| Metric (T7) | This best | All-time best |
+|---|---|---|
+| Apex mph | 102.2 | 111.5 |
+| Gear (entry→apex) | **4→5** | 4→4 |
+| Throttle@apex (%) | **29** | **100** |
+| Apex style | late | early |
 
-- **T10 South Bend: +2.6 mph** (and vs Nov +4.6 mph). South Bend was your Dec coaching target — you found 0.240 s last weekend, and **it carried across the tire change**. That's confirmation it's a real line/technique improvement, not a tire artifact.
-- **T17 Hog Pen apex: +1.1 mph vs Dec, +0.8 mph vs Nov.** The Hog Pen technique work from prior coaching also held through the compound change.
-- **T14a Roller Coaster: +1.1 mph vs Dec.** Small but in the right direction.
+| Metric (T8) | This best | All-time best |
+|---|---|---|
+| Apex mph | 101.9 | 109.8 |
+| Gear (entry→apex) | **5→5** | **4→4** |
+| Throttle@apex (%) | **32** | **100** |
 
----
+T7 is mid-upshift this weekend (4→5 at apex) vs Dec where 4th held through. T8 is already in 5th. Throttle@apex went from 100% (full commitment through the Esses) to 29–32% (partial throttle, lifting). **The Esses as a flat-out sequence has been replaced with an upshift-and-lift sequence.** That alone explains most of the Esses sector regression.
 
-## Corner Stats — Top 5 Laps, Day 2
+### T5a / T5b Snake entry (apex Δ −5.9 / −6.2 mph) — **grip drop, same line**
 
-### T9 Esses — biggest grip-envelope hit
+| Metric (T5b) | This best | All-time best |
+|---|---|---|
+| Apex mph | 68.4 | 74.6 |
+| Throttle@apex (%) | 92 | 100 |
+| Peak latG | **1.06** | **1.22** |
 
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Brake release (m) | Trail past apex | Throttle@apex |
-|---|---|---|---|---|---|---|---|---|
-| **L20 ★** | 2:21.408 | 95.5 | 92.7 | 0.87 | 8% | −78.7 | 12.8 m | 41% |
-| L13 | 2:21.921 | **100.1** | 90.0 | 0.89 | 31% | −107.3 | 38.6 m | 30% |
-| L21 | 2:22.139 | 98.1 | 92.2 | 0.90 | 32% | −107.6 | 36.8 m | 53% |
-| L5 | 2:22.632 | 99.1 | 94.4 | 0.88 | 58% | −107.7 | 29.1 m | 56% |
-| L22 | 2:23.403 | 94.4 | 91.2 | 0.83 | 12% | −93.3 | 23.7 m | 49% |
+Snake entry shows the inverse signature: technique is largely the same (early apex, near-100% throttle, no brake), but **peak lat G is dramatically lower (1.06 vs 1.22)**. That's a grip-envelope difference — either tire compound (RS4 vs Nankang) or setup (front bar load distribution) is delivering less peak lateral G than the Dec reference. No driver-side fix available; this corner reports on what the car can do.
 
-Peak lat G at T9 across the top 5 is **0.83–0.90**. Same corner on Dec L24 was **0.97**. Same corner on Nov L27 was **0.95**. That's roughly a 10% lateral-grip reduction at the highest-G corner of the lap — confirming the new compound has a different (lower) peak-lateral-G envelope or hasn't been cycled enough to deliver. L20 was *more cautious* than the next-best laps (8% brake, 41% throttle, only 12.8 m of trail-brake past apex) — the best lap was the most conservative through T9, not the most committed. **No technique action needed here — the question is "does grip come back as the tires get more cycles, or does the RS4 just live at this lateral G."**
+### T11 Oak Tree entry (apex Δ −4.5 mph) — **brake-and-trail line changed**
 
-### T17 Hog Pen apex — the recurring focus
+| Metric | This best | All-time best |
+|---|---|---|
+| Apex mph | 57.2 | 61.7 |
+| Brake onset (m before apex) | **114.3** | 104.4 |
+| Trail past apex (m) | **13.7** | **34.9** |
+| Brake max (%) | 61 | 59 |
+| Peak latG | 0.89 | 1.04 |
 
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Throttle@apex |
-|---|---|---|---|---|---|---|
-| **L20 ★** | 2:21.408 | 68.8 | 67.7 | 1.28 | 2% | **32%** |
-| L13 | 2:21.921 | 66.4 | 66.1 | 1.21 | 21% | 35% |
-| L21 | 2:22.139 | **69.9** | 67.6 | **1.30** | 1% | 0% |
-| L5 | 2:22.632 | 67.1 | 66.3 | 1.23 | 13% | 33% |
-| L3 | 2:23.419 | 63.0 | 62.9 | 1.13 | 43% | **91%** |
-| L6 | 2:23.736 | 65.4 | 65.0 | 1.15 | 11% | **100%** |
-
-**T17 throttle commitment on the best lap went backwards: Nov 51% → Dec 60% → Mar 32%.** Same pattern persists (best lap is *not* the most committed at T17), now with extra caution because the tire is new. L3 and L6 (the slower warm-up laps) ran 91% and 100% throttle at apex respectively — that's available; the driver just isn't trusting the RS4 here yet. **Once you have another weekend on this compound and know what it does, expect this pattern to be the headline target again.** L21 also hit 1.30 lat G at T17 — the tire *can* take it, the throttle just isn't being asked for it on the clean lap.
-
-### T11 Oak Tree — Dec's technique change held
-
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Throttle@apex |
-|---|---|---|---|---|---|---|
-| **L20 ★** | 2:21.408 | 57.2 | 49.3 | 0.96 | 23% | 0% |
-| L13 | 2:21.921 | 60.0 | 49.6 | 0.92 | 51% | 0% |
-| L21 | 2:22.139 | 58.8 | 49.6 | 0.96 | 60% | 0% |
-| L5 | 2:22.632 | 56.8 | 49.4 | 0.92 | 51% | 0% |
-| L22 | 2:23.403 | 56.1 | 49.4 | 0.86 | 70% | 0% |
-
-Same shape as Dec — brake-and-rotate at T11 with 0% throttle at apex. Apex speed slightly down (57.2 vs Dec's 60.7 — but that's tire). Min speed 49.3 mph is comparable. **The technique pattern held through the compound change** — the driver is doing the same thing at T11, just at slightly lower grip levels.
+Brake reference moved **10m earlier**, and trail-past-apex collapsed from 34.9m to 13.7m — you're finishing the brake well before apex now, killing the rotation phase that the previous setup rewarded. With less trail-braking through T11, peak lat G drops 15%. This is technique that can be deliberately tried back: **delay brake-onset by ~10m and carry the brake ~20m further past apex** next session at T11.
 
 ---
 
-## Did Prior Coaching Land?
+## Improvement Targets — Next Weekend
 
-| Prior target | Status |
-|---|---|
-| **South Bend line** (originally Nov target — recover 0.220 s) | **Held through the tire change.** T10 apex +4.6 mph vs Nov, +2.6 mph vs Dec. S5 sector equal to Nov despite the tire downgrade. This is now a confirmed real improvement. |
-| **T17 throttle commitment** (Nov + Dec target) | **Regressed on the new tire** — best-lap T17 throttle 32% vs Dec's 60%. Re-emerges as next-session target. The slow warm-up laps prove the tire takes it (L3 91%, L6 100%). |
-| **T11 Oak Tree brake-and-rotate** (Dec re-frame) | **Held.** Same technique pattern at slightly lower grip. No action needed. |
+### 1. Esses (T7 / T8 / T9) — try 4th gear again
 
----
+**Current:** L20 ran T9 in 5th gear, 8% brake max, 41% throttle@apex, 95.5 mph apex.
+**Reference:** Dec L24 ran T9 in 4th gear, 71% brake max, 54% throttle@apex, 107.8 mph apex.
 
-## Improvement Targets — Next Session
+This is the largest single deficit on the lap (−12.2 mph at T9, contributing most of the +0.754s S4 Esses regression). Next session, deliberately hold 4th gear through T7–T9 on a clean lap and see what the new tire/setup produces. If 4th lights up the rears or causes lift-off rotation, the 5th-gear approach is a setup-driven necessity; if it produces a higher apex speed, the 5th-gear approach was an experiment that didn't work.
 
-### 1. Don't fight the tire — first session is calibration
-Do not try to chase Dec's lap times on this compound. The grip envelope is different and the data shows you're still learning it. **Use the next session on these tires to find the new commitment limits**, especially through the Esses. Reference: L21 ran 1.30 lat G at T17 — the tire *can* deliver. Find that ceiling at the Esses too.
+### 2. T11 Oak Tree — try Dec's brake reference
 
-### 2. Carry the new T17 commitment back up to 60%+ once you trust the tire
-L3 and L6 (warm-up laps) hit 91% and 100% throttle at T17 apex respectively. The tire takes it. L20 (best lap) only used 32%. Get a few clean laps in and rebuild the L23/L24-equivalent commitment from Dec. Target: 60%+ throttle at T17 apex on a clean lap.
+**Current:** L20 brake onset at 114m, trail past apex 13.7m, peak lat G 0.89.
+**Reference:** Dec L24 brake onset at 104m, trail past apex 34.9m, peak lat G 1.04.
 
-### 3. Protect what survived the tire change
-South Bend line (T10 apex up 2.6–4.6 mph across the series), T11 brake-and-rotate, T14a/T17a Hog Pen exit speeds. These three are now confirmed independent of compound. Don't change them while you're recalibrating the rest.
+T11 is a corner the Miata's no-rear-bar setup historically rewarded with deep trail-braking. The new setup may or may not still reward it. **Try one lap with brake onset moved later (~104m) and ~20m more trail past apex.** If lat G recovers, the rotation technique transfers. If not, the new setup wants a different line at T11.
+
+### 3. Re-establish baseline pace before chasing the Dec deltas
+
+The driver is on a fundamentally different car (tires + suspension + alignment + temperature). The +3.5s regression is the cost of re-learning a new platform; expect 1–2 more weekends to close most of that gap as the technique adapts. **Don't try to drive the Dec lap on the new car** — let the data from the next session inform what the new setup actually wants. The data signal this is working: the 4 corners where the new setup is faster than Dec (T10, T14a, T16, T17) should grow, not shrink.
 
 ---
 
 ## What to Keep Doing
 
-- **The consistency.** 2.323 s std dev on Day 2 is the lowest of any single-day session in the series. On a brand-new tire that's a strong signal — you're hitting your marks even when the marks are being calibrated.
-- **Smoothness.** Steer RMS 101.5 vs Dec 102.5 vs Nov 113.1 — the hands stayed clean through the tire change.
-- **The Day 1 → Day 2 step (−1.578 s)** is the same shape as Dec's progressively-faster-day-2 pattern. Tire learning happens on session 2 of a weekend.
-- **CAN dropouts: 0 again.** Two clean weekends in a row of full pedal data.
+- **T10 South Bend — 85.5 mph apex** (was 82.9 Dec, **+2.6 mph**). The new setup likes this corner.
+- **T14a Roller Coaster — 73.9 mph apex** (was 72.9, **+1.0 mph**). Same.
+- **T16 / T17 Hog Pen entry — 76.8 / 68.8 mph apex** (both same or better than Nov/Dec series bests).
+- These 4 corners are evidence the new setup adds rotation/turn-in capability in slow-to-medium corners — keep the approach there.
 
 ---
 
-## Series Baseline
+## Series Baseline (unchanged from Dec)
 
-| Weekend | Tires | Conditions | Best | Optimal | Gap |
-|---|---|---|---|---|---|
-| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (31 → 37 °F) | 2:18.888 | 2:17.378 | +1.510 |
-| 2025-12-13-14 | Nankang CR-S (6–10 cycles) | Cold dry, D2 18.6 mph wind | **2:17.884** | **2:16.692** | +1.192 |
-| **2026-03-07-08** | **Hankook Ventus RS4 (4–6 cycles)** | **Warm dry (68 → 77 °F)** | 2:21.408 | 2:19.877 | +1.531 |
+| # | Sector | Best (s) | Source |
+|---|---|---|---|
+| 1 | T1 | 14.201 | L22 @ 2025-12-14 |
+| 2 | NASCAR | 16.401 | L21 @ 2025-12-13 |
+| 3 | Snake | 9.084 | L24 @ 2025-12-14 |
+| 4 | Esses | 19.100 | L24 @ 2025-12-14 |
+| 5 | South Bend | 13.080 | L14 @ 2025-12-14 |
+| 6 | Oak Tree | 3.656 | L12 @ 2025-12-13 |
+| 7 | Back Straight | 29.080 | Nov, 2025-11-30 |
+| 8 | Roller Coaster | 6.560 | Nov, 2025-11-30 |
+| 9 | Hog Pen | 11.889 | L12 @ 2025-12-13 |
+| 10 | Front Straight | 13.438 | Nov, 2025-11-30 |
+| — | **Best lap** | **2:17.884** | L24 @ 2025-12-14 |
+| — | Optimum | **2:16.692** | Dec 2025 |
 
-Three weekends. **The series-best best-lap and optimal both still belong to Dec on the Nankang CR-S.** The Hankook RS4 either needs more heat cycles, different pressures, or simply doesn't match the CR-S's peak grip on this car at this track. The next weekend on this tire will tell you which.
-
-**Two cross-compound carry-overs (technique that survived the switch):** South Bend line improvement (T10 +2.6 to +4.6 mph), Hog Pen apex (T17 +0.8 to +1.1 mph). Those are now real, not artifacts.
+No sector records moved this weekend.
 
 ---
 
-## Data-Quality Notes
+## Data Quality Notes
 
-- **No CAN dropouts.** Every lap's pedal data is usable.
-- **No cold pressures recorded.** Strongly recommended for next session on the RS4 — pressure window is likely different from CR-S, and chasing pressure changes is the fastest way to bring the new tire's grip up. Without pressures we can't tell whether grip is being lost to under/over-inflation vs the tire compound itself.
-- **Day 1 sample is small** (13 on-pace) — Day 2 (19 on-pace) is the higher-confidence read.
-- **Tire age range "4–6 heat cycles"** — narrowing this to an actual number on the next import would let us track the wake-up curve of the RS4 specifically.
+- **Saturday weather unavailable** from Open-Meteo for the Mar 7 14:47 UTC session — can't quantify temp / wind for Sat-1 or Sat-2. Sunday data is valid (66°F, 7 mph wind).
+- **Sun-3 (L26–L28)** was a 1-on-pace-lap cool-down stint; not a meaningful pace session.
+- **No CAN-dropout flagged laps** this weekend.
+- **Tire context is fundamentally different from prior weekends.** The Dec optimum (2:16.692) was on heat-cycled Nankang CR-S in 38°F air; this weekend is on fresh Hankook RS4 in 66°F air. Apex-speed and peak-G deltas vs Dec are partly tire-compound differences, not pure technique.

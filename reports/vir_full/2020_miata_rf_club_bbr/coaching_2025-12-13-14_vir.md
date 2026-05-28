@@ -1,191 +1,210 @@
-# VIR Full Course — December 13–14, 2025
+# 2025-12-13-14 VIR Full — Weekend Coaching Report
 
-**Tires:** Nankang CR-S 225/45R17, 6–10 heat cycles (one weekend more than Nov)
-**Car:** 2020 Mazda Miata RF Club, BBR tune
-**Source files:** `session_20251213_1011_vir_full_v3.csv` (D1), `session_20251214_1011_vir_full_v3.csv` (D2)
-**Compared to:** `2025-11-29-30_vir` (Nankang CR-S, 4–7 cycles, cold dry)
+**Event:** Virginia International Raceway — Full Course
+**Dates:** December 13–14, 2025 (2-day HPDE)
+**Car:** 2020 Mazda MX-5 RF — Club, BBR
+**Tires:** Nankang CR-S, 225/45R17, ~6–10 heat cycles (same set as Nov, more cycles)
 
 ---
 
 ## Conditions
 
-| | Day 1 — Sat Dec 13 | Day 2 — Sun Dec 14 |
-|---|---|---|
-| Air temp (session start) | 3.3 °C / 38 °F | 1.1 °C / 34 °F |
-| Humidity | 63% | 48% |
-| Cloud / precip | 58% cloud, dry | 37% cloud, dry |
-| Wind | 4.3 mph @ 238° (light SW) | **18.6 mph @ 335° (strong NW)** |
+| Date | Day | Temp (°F) | Wind (mph) | Cloud | Track state |
+|---|---|---|---|---|---|
+| Sat Dec 13 | day_1 | 38 | 4.3 (light) | clear | dry |
+| Sun Dec 14 | day_2 | 39 | **11.7 NNW** | clear | dry |
 
-Cold dry both days, similar to Nov. Day 2's **18.6 mph NW wind is the big new variable** — VIR's front and back straights run roughly N–S, so a 335° wind puts a meaningful headwind component on the front straight when heading north. This shows up clearly in the sector deltas vs Nov (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s — the only two sectors that got slower vs Nov, both straights). Treat those two straight-line regressions as wind, not technique.
+Same temperature both days, but **Sunday was meaningfully windier** (11.7 mph from NNW vs 4.3 mph Sat). NNW puts a headwind down the back straight and a crosswind on the front straight — both of which show up in the sector data later (every straight-line sector regressed vs the calm Nov weekend, while every lateral-grip corner improved).
 
 ---
 
 ## Top-Line Numbers
 
-| Metric | Day 1 | Day 2 | Weekend | Δ vs Nov |
+| Metric | Value | Source |
+|---|---|---|
+| Weekend best lap | **2:17.884** | L24 @ 2025-12-14 (Sun) |
+| Weekend optimum | 2:16.692 | sum of sector bests below |
+| Gap to weekend optimum | **+1.192s** | tightened by 0.318s vs Nov |
+| Best vs prior weekend (Nov 29–30) | **−1.004s** vs 2:18.888 | **new series best** |
+| Optimum vs prior weekend optimum | **−0.686s** vs 2:17.378 | **new series optimum** |
+| Sat best (across 4 on-track sessions) | 2:18.019 | L12 @ 2025-12-13 (in Sat-2) |
+| Sun best (across 4 on-track sessions; 5th was parade) | **2:17.884** | L24 @ 2025-12-14 (in Sun-4) |
+
+New series best by 1.004s on the same tires. Sat-2 alone (2:18.019) already beat Nov's full-weekend best by 0.869s; Sun-4 added another 0.135s despite Sunday's wind penalty on the straights.
+
+---
+
+## Per-Session Breakdown
+
+### Saturday Dec 13 — 4 on-track sessions
+
+| Session | Laps in session | Fast lap | Time | Fast lap arrived at |
 |---|---|---|---|---|
-| **Best lap** | 2:18.019 (L12) | **2:17.884 (L24)** | **2:17.884** | **−1.004 s** |
-| Theoretical optimal | 2:18.232 | 2:16.312 | **2:16.692** | **−0.686 s** |
-| Time left on best | +0.213 s (D1) | +1.572 s (D2) | **+1.192 s** | −0.318 s tighter |
-| On-pace laps | 20 | 16 | 36 | same |
-| Median on-pace | 2:25.681 | 2:22.825 | — | faster |
-| Std dev (on-pace) | 4.501 s | 3.644 s | — | tighter |
-| Peak lateral G (best) | 1.31 | **1.33** | — | **+0.10 vs Nov** |
-| Peak braking G (best) | 1.04 | **1.08** | — | **+0.24 vs Nov** |
-| Top speed (best) | 121.0 | 120.9 | — | −0.6 mph (wind) |
-| CAN-bus dropout laps | 0 | 0 | **0** | 4 fewer than Nov |
+| Sat-1 | L1–L6 | L4 | 2:22.648 | 4 of 6 |
+| Sat-2 | L7–L15 | **L12** | **2:18.019** ★ | 6 of 9 |
+| Sat-3 | L16–L23 | L19 | 2:19.901 | 4 of 8 |
+| Sat-4 | L24–L30 | L26 | 2:22.210 | 3 of 7 |
 
-**Headline.** Weekend best **2:17.884 (D2 L24)** — a full second faster than Nov's 2:18.888 on the same tires (just more cycles). The theoretical optimum dropped 0.686 s vs Nov. Both days were faster than Nov's best, and the cross-day spread shrank from 2.551 s in Nov to **0.135 s** here — much more consistent ceiling. The driver is meaningfully more committed (Peak lat G +0.10, Peak decel G +0.24, % brake down, steering RMS down) and **CAN-bus dropout is gone for the entire weekend** — pedal-metric analysis is now reliable on every lap.
+Notable: **Saturday's all-day best landed in Sat-2, not the last session.** Pace actually drifted *backward* across Sat-3 and Sat-4. That's atypical (Nov showed a clean session-over-session stairstep). Possible reads: Sat-2 was peak tire+brake temp window, then conditions changed or fatigue set in.
 
----
+### Sunday Dec 14 — 4 on-track sessions (Sun-2 was parade laps, excluded)
 
-## Day-by-Day
+| Session | Laps in session | Fast lap | Time | Fast lap arrived at |
+|---|---|---|---|---|
+| Sun-1 | L1–L6 | L5 | 2:23.631 | 5 of 6 |
+| Sun-2 | L7–L9 | — | parade laps only | — |
+| Sun-3 | L10–L17 | L14 | 2:18.825 | 5 of 8 |
+| Sun-4 | L18–L26 | **L24** | **2:17.884** ★ | 7 of 9 |
+| Sun-5 | L27–L31 | L30 | 2:20.467 | 4 of 5 |
 
-**Day 1** (20 on-pace, 4.501 s std dev). Came competitive by L11 (2:20.869) and set the day's best at L12 (2:18.019) — already 0.869 s faster than Nov's weekend best. The fastest cluster (L11, L12, L19, L21) shows consistent sub-2:21 pace once the tires were working.
-
-**Day 2** (16 on-pace, 3.644 s std dev). L7 (3:50.250) and L8 (3:57.226) — both ~4 min lap times with abnormally low top speeds (76 mph) — are almost certainly a yellow-flag stint and correctly flagged off-pace. The fast window came late in the session: four sub-2:19s from L19 to L26 including the weekend best L24 (2:17.884). Day 2's wind hurt straight-line speed but didn't affect cornering — every lateral-grip corner gained.
+Sun-3 already beat Saturday's full-day best. Sun-4 delivered the series best. Sun-5 dropped off — consistent with end-of-day fatigue or wind picking up further. Sun-2's 3:50 / 3:57 lap times look like a full-course yellow or parade — those laps are off-pace by design, not slow driving.
 
 ---
 
-## Sector Analysis — Best Lap (D2 L24) vs Weekend Optimum
+## Sector Analysis — vs prior weekend (Nov 29–30)
 
-| # | Sector | Optimum | L24 | Δ | Optimum from |
+| # | Sector | Dec (s) | Nov (s) | Δ s |
+|---|---|---|---|---|
+| 1 | T1 | 14.201 | 14.333 | **−0.132** ↑ |
+| 2 | NASCAR | 16.401 | 16.507 | **−0.106** ↑ |
+| 3 | Snake | 9.084 | 9.120 | **−0.036** ↑ |
+| 4 | Esses | 19.100 | 19.300 | **−0.200** ↑ |
+| 5 | South Bend | 13.080 | 13.320 | **−0.240** ↑ |
+| 6 | Oak Tree | 3.656 | 3.720 | **−0.064** ↑ |
+| 7 | Back Straight | 29.127 | 29.080 | +0.047 ↓ |
+| 8 | Roller Coaster | 6.573 | 6.560 | +0.013 ↓ |
+| 9 | Hog Pen | 11.889 | 12.000 | **−0.111** ↑ |
+| 10 | Front Straight | 13.581 | 13.438 | +0.143 ↓ |
+
+**7 of 10 sectors improved.** Every lateral-grip / cornering sector gained time (S1–S6 + S9). Every straight-line sector regressed (S7 Back Straight, S8 Roller Coaster, S10 Front Straight). The pattern matches Sunday's headwind from NNW exactly — straights pay the wind tax, corners don't.
+
+---
+
+## Ranked Corner Improvement Opportunities
+
+**Corners with apex-speed deficit vs all-time best** (from this weekend's best lap):
+
+| Turn | This best apex (mph) | All-time best apex (mph) | Δ mph | This lap | All-time source |
 |---|---|---|---|---|---|
-| 1 | S1 T1 | **14.201** | 14.409 | +0.208 | L22 D2 |
-| 2 | S2 NASCAR | **16.401** | 16.684 | +0.283 | L21 D1 |
-| 3 | S3 Snake ★ | 9.084 | 9.084 | 0.000 | L24 D2 |
-| 4 | S4 Esses ★ | 19.100 | 19.100 | 0.000 | L24 D2 |
-| 5 | S5 South Bend | **13.080** | 13.295 | +0.215 | L14 D2 |
-| 6 | S6 Oak Tree | **3.656** | 3.761 | +0.105 | L12 D1 |
-| 7 | S7 Back Straight | 29.127 | 29.231 | +0.104 | L12 D1 |
-| 8 | S8 Roller Coaster | 6.573 | 6.598 | +0.025 | L12 D1 |
-| 9 | S9 Hog Pen | **11.889** | 12.082 | +0.193 | L12 D1 |
-| 10 | S10 Front Straight | 13.581 | 13.640 | +0.059 | L23 D2 |
-| | **Total** | **2:16.692** | 2:17.884 | **+1.192** | |
+| 13 | 115.0 | 116.2 | −1.1 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 3 | 64.1 | 65.1 | −1.1 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 16 | 75.9 | 76.8 | −0.9 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 2 | 64.0 | 64.8 | −0.9 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 17a | 81.4 | 82.2 | −0.8 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 14a | 72.9 | 73.4 | −0.5 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 4 | 49.7 | 50.1 | −0.4 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 17 | 67.6 | 68.0 | −0.4 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
+| 15 | 67.4 | 67.6 | −0.2 | L24 @ 2025-12-14 | Nov 2025, 2025-11-30 |
 
-L24 owns S3 Snake ★ and S4 Esses ★ outright. **Five of the 10 sector optima come from D1 L12** (Oak Tree, Back Straight, Roller Coaster, Hog Pen — the second half of the lap). L12's S6→S9 combination is what makes the theoretical optimal so much lower than the actual best. **D1 L12 had the better second half of the lap; D2 L24 had the better first half. The full ideal lap exists in pieces across both days.**
+**Corners at or above all-time-best apex** (this weekend owns the apex): T7 (111.5 mph, **+4.5 vs Nov**), T8 (109.8, +1.2), T9 (107.8, **+3.9**), T6b (88.8, +0.6), T10 (82.9, **+2.0**), T6a (80.5), T5b (74.6), T11 (61.7), T5a (59.5), T14b (49.1), T1 (47.5), T12 (44.7) — 12 corners total. The Esses (T7/T8/T9) is the headline story: +4.5/+1.2/+3.9 mph all on one sequence.
 
 ---
 
-## Cross-Weekend Deltas — Did Nov's Coaching Land?
+## Per-Corner Technique Deltas (top deficits)
 
-| # | Sector | Dec optimum | Nov optimum | Δ s | Δ % |
-|---|---|---|---|---|---|
-| 1 | S1 T1 | 14.201 | 14.333 | **−0.132** | −0.92% |
-| 2 | S2 NASCAR | 16.401 | 16.507 | **−0.106** | −0.64% |
-| 3 | S3 Snake | 9.084 | 9.120 | −0.036 | −0.39% |
-| 4 | S4 Esses | 19.100 | 19.300 | **−0.200** | −1.04% |
-| 5 | S5 South Bend | 13.080 | 13.320 | **−0.240** | −1.80% |
-| 6 | S6 Oak Tree | 3.656 | 3.720 | **−0.064** | −1.72% |
-| 7 | S7 Back Straight | 29.127 | 29.080 | +0.047 | +0.16% |
-| 8 | S8 Roller Coaster | 6.573 | 6.560 | +0.013 | +0.20% |
-| 9 | S9 Hog Pen | 11.889 | 12.000 | **−0.111** | −0.93% |
-| 10 | S10 Front Straight | 13.581 | 13.438 | +0.143 | +1.06% |
+### T3 — NASCAR entry (apex Δ −1.1 mph) — **over-braking**
 
-**Eight of ten sectors improved.** The two regressions (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s) are both straight-line, both on Day 2 wind day — almost certainly the 18.6 mph NW headwind. Same tires, same compound, same driver, more cycles — the cornering improvements have to be technique + (slightly) warmer conditions, not the tires (which are *more* worn than Nov).
+| Metric | This best (L24 @ 2025-12-14) | All-time best (Nov, 2025-11-30) |
+|---|---|---|
+| Apex mph | 64.1 | 65.1 |
+| Brake onset (m before apex) | 122.6 | 126.6 |
+| Brake max (%) | **93** | **55** |
+| Trail past apex (m) | 0.0 | 0.0 |
+| Throttle@apex (%) | 75 | 80 |
+| Peak latG | **1.10** | **1.18** |
 
-**Per-corner apex-speed gains** (top 5): T9 Esses **+3.9 mph**, T5a t4_t5a **+2.3 mph**, T10 South Bend **+2.0 mph**, T5b Snake +1.3 mph, T8 Esses +1.2 mph. All lateral-grip corners. The driver is using more of the tire than in Nov.
+Brake max is **+38 percentage points heavier** than Nov, but apex speed is lower and peak lat G is lower (1.10 vs 1.18). The brake-pedal effort isn't translating into a faster sector — it's pulling the front down, compromising rotation, and losing entry speed. The Nov reference was *less* brake pressure and *more* corner speed. Try the Nov brake pressure ceiling at T3.
 
-**Per-corner apex-speed losses** (top 5): T13 back_straight −1.1 mph, T3 nascar_bend −1.1 mph, T16 hog_pen −0.9 mph, T2 t1_t2 −0.9 mph, T17a hog_pen −0.8 mph. All straight-line / drag-down corners → consistent with the Day 2 headwind read.
+### T13 — Back straight peak (apex Δ −1.1 mph) — **wind, not technique**
 
-### Did the three Nov targets land?
+| Metric | This best (L24 @ 2025-12-14) | All-time best (Nov, 2025-11-30) |
+|---|---|---|
+| Apex mph | 115.0 | 116.2 |
+| Throttle@apex (%) | **100** | **38** |
+| Gear (entry→apex) | 4→5 | 5→5 |
 
-1. **T17 throttle commitment** (Nov coaching target — recover ~0.880 s in S10 + S1). **Partial.** D2 L24 (best): 60% throttle at T17 apex (Nov L27 was 51% — improved by 9 pp). D2 L21 reached **95% throttle at T17 apex** on a 2:18.187 lap — closest the driver has come to the L14/L23/L31 Nov references of 99–100%. **S9 Hog Pen optimum dropped 0.111 s vs Nov** and S10 went slightly worse (wind). The technique is moving in the right direction but the best lap still isn't the most committed lap at T17.
+100% throttle here this weekend vs 38% in Nov (already in 5th, cruise window) — both valid lines. The 1.1 mph deficit is the **NNW headwind**, not technique. **No action.**
 
-2. **T11 Oak Tree** (Nov coaching target — hold more throttle through apex). **Changed approach, worked anyway.** D2 L24 went 0% throttle through T11 apex with 59% brake (Nov L27 was 60% throttle / 0% brake). Different technique — now a brake-and-rotate instead of a flow-through — but **S6 Oak Tree optimum dropped 0.064 s vs Nov**. Apex speed +1.0 mph. Whatever the change, the time is better.
+### T16 / T17 / T17a — Hog Pen entry sequence (apex Δ −0.9 / −0.4 / −0.8 mph)
 
-3. **S5 South Bend** (Nov coaching target — replicate L26's line, recover 0.220 s). **Nailed.** Dec optimum dropped **0.240 s** vs Nov. T10 apex +2.0 mph. This is the cleanest "you found the time" of the three.
+| Metric (T16) | This best (L24 @ 2025-12-14) | All-time best (Nov, 2025-11-30) |
+|---|---|---|
+| Apex mph | 75.9 | 76.8 |
+| Brake onset (m before apex) | **55.5** | 62.7 |
+| Brake max (%) | 40 | 38 |
+| Trail past apex (m) | **35.9** | 32.1 |
+| Peak latG | **0.79** | 0.86 |
 
----
+Brake onset moved 7m later (55.5 vs 62.7) with +3.8m more trail past apex — apex speed dropped, lat G dropped (0.79 vs 0.86). The line experiment didn't pay off; some of the loss is also downwind on Sunday. Revert to the Nov reference: brake onset ~62m, ~32m trail.
 
-## Corner Stats — Top 5 Laps, Day 2
+### T2 — T1 exit / NASCAR approach (apex Δ −0.8 mph) — **likely wind**
 
-### T1 (front_straight_braking) — sector S1
+| Metric | This best (L24 @ 2025-12-14) | All-time best (Nov, 2025-11-30) |
+|---|---|---|
+| Apex mph | 64.0 | 64.8 |
+| Throttle@apex (%) | 100 | 100 |
+| Peak latG | **1.05** | 1.02 |
 
-| Lap | Lap time | Entry (−100m) | Apex | Min | Peak latG | Brake max | Brake release (m) | Throttle@apex |
-|---|---|---|---|---|---|---|---|---|
-| **L24 ★** | 2:17.884 | 84.9 | 47.5 | 47.1 | 1.18 | 97% | +43.5 | **84%** |
-| L21 | 2:18.187 | 84.5 | 45.3 | 44.4 | 1.16 | 100% | +19.9 | 26% |
-| L14 | 2:18.825 | 86.2 | **49.3** | 47.8 | 1.17 | 100% | +44.4 | 0% |
-| L16 | 2:19.189 | 84.4 | 48.0 | 47.5 | 1.14 | 100% | +41.4 | 52% |
-| L22 (owns S1) | 2:23.187 | 86.4 | 47.0 | 45.8 | 1.21 | 100% | +22.9 | 0% |
-
-L24's T1 was very clean: 84% throttle by apex, 97% brake, 1.18 lat G. **Entry mph at −100 m for L24 = 84.9, vs L22 at 86.4** — same 1.5 mph entry-speed differential pattern as Nov, just smaller. L14 hit 49.3 mph apex (highest of session) but was at 0% throttle there (still releasing brake). The fix is still the same — feed T1 more entry speed via T17 exit.
-
-### T9 (Esses) — biggest apex gain vs Nov (+3.9 mph)
-
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Brake release | Trail past apex | Throttle@apex |
-|---|---|---|---|---|---|---|---|---|
-| **L24 ★** | 2:17.884 | **107.8** | 102.5 | 0.97 | 71% | −107.3 | 23.0 m | 54% |
-| L21 | 2:18.187 | 107.3 | 102.8 | 0.95 | 52% | −107.8 | 13.4 m | **100%** |
-| L14 | 2:18.825 | 102.8 | 99.7 | 0.91 | 27% | — | 13.9 m | 34% |
-| L16 | 2:19.189 | 107.2 | 102.3 | **1.00** | 36% | — | 16.6 m | 43% |
-| L30 | 2:20.467 | 103.3 | 96.4 | 0.97 | 46% | — | 24.7 m | 41% |
-
-L24 at T9: **107.8 mph apex with 71% brake still active and 54% throttle** — that's a deliberate brake-and-rotate through a 100+ mph corner. The 23 m of trail-brake past apex is unusual at this speed and is the technique change vs Nov (Nov L27 at T9: ~103.9 mph, 0% brake). L21 hit 100% throttle at apex — the next step is matching L21's full-throttle commitment while keeping L24's apex speed.
-
-### T11 (Oak Tree) — technique flipped from Nov
-
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Brake onset (m) | Trail past apex (m) | Throttle@apex |
-|---|---|---|---|---|---|---|---|---|
-| **L24 ★** | 2:17.884 | 61.7 | 49.3 | 1.04 | **59%** | 104.4 | 34.9 m | **0%** |
-| L21 | 2:18.187 | 62.2 | 50.1 | 1.03 | 72% | 103.6 | 27.8 m | 0% |
-| L14 | 2:18.825 | 62.0 | 48.9 | 1.02 | 64% | 109.1 | 38.4 m | 0% |
-| L16 | 2:19.189 | 62.9 | 50.0 | 0.97 | 54% | 113.4 | 37.3 m | 0% |
-| L30 | 2:20.467 | 60.8 | 51.3 | 0.96 | 82% | 105.2 | 16.9 m | 0% |
-
-**Every top-5 lap at T11 is now a brake-and-rotate with 0% throttle at apex** — the Nov flow-through-with-no-brake approach is gone. Apex speed +1.0 mph vs Nov, S6 sector −0.064 s. The change worked, but the data shows the new technique is consistent across laps now, so the future opportunity may be the *opposite* direction again: trying L21's 72% brake max (highest brake) vs L24's 59% to see if a heavier brake-and-quicker-rotate finds another increment.
-
-### T17 (Hog Pen apex) — the persistent target
-
-| Lap | Lap time | Apex | Min | Peak latG | Brake max | Throttle@apex | Throttle pickup (m) |
-|---|---|---|---|---|---|---|---|
-| **L24 ★** | 2:17.884 | 67.6 | 67.0 | **1.33** | 15% | **60%** | 0.0 |
-| L21 | 2:18.187 | 66.6 | 66.3 | 1.26 | 33% | **95%** | 0.0 |
-| L14 | 2:18.825 | 67.6 | 67.5 | 1.21 | 30% | 68% | 0.0 |
-| L16 | 2:19.189 | 65.7 | 65.5 | 1.27 | 14% | 53% | 0.0 |
-| L30 | 2:20.467 | 65.8 | 65.2 | 1.14 | 13% | 66% | 0.0 |
-
-**L24 hit the session's highest peak lat G (1.33) at T17 — the tire is willing.** Throttle commitment at apex up from 51% (Nov L27) → 60% (Dec L24) — real improvement. **L21 reached 95% throttle at T17 apex on a 2:18.187 lap — the reference lap is right there.** If the next session's clean lap can be 95–100% at T17 apex like L21 was, the long-running S10/S1 deficit should finally close. The pattern is *still* "best lap is not the most committed lap at T17" — same shape as Nov, just narrower margin.
+Identical inputs, slightly higher lat G this weekend (1.05 vs 1.02). The 0.8 mph apex deficit on identical technique is consistent with the crosswind component on the front-straight approach. No action.
 
 ---
 
-## Improvement Targets — Next Session
+## Improvement Targets — Next Weekend
 
-### 1. Carry L21's T17 commitment onto the clean lap (Target: ~0.250+ s across S10 + S1)
-L24 → 60% throttle at T17 apex. **L21 ran 95%** on a 2:18.187 lap. The technique exists, the apex speeds are similar (66.6 vs 67.6 mph), and the tire takes 1.33 lat G there. Push to L21's level of throttle commitment on the clean lap. **This is the third weekend in a row this is the top target.**
+### 1. T3 NASCAR entry — reduce brake max to ~70% to recover apex speed (target: clip 0.10–0.15s in S2)
 
-### 2. Steal D1 L12's second half on a D2 chassis day (Target: ~0.200–0.400 s)
-L12 D1 owns Oak Tree, Back Straight, Roller Coaster, and Hog Pen sector optima. L24 D2 owns Snake and Esses. **No single lap combined them.** Watch L12's S6→S9 line vs L24's and find what L12 was doing different — likely a different braking point at T11 or a smoother T16 exit. The data is in the per-corner traces.
+**Current:** L24 ran 93% brake max at T3, 64.1 mph apex, 1.10 lat G.
+**Reference:** Nov L27 ran 55% brake max, 65.1 mph apex, 1.18 lat G — **lower brake pressure, higher apex speed, higher lat G** in a directly comparable car/tire setup.
 
-### 3. Don't over-correct the wind-related straight-line losses
-S7 Back Straight and S10 Front Straight each got slightly slower vs Nov — the only two sectors that did. Day 2 had 18.6 mph NW headwind on the front straight. **This is not a technique problem. Don't change anything to chase it.** When the next weekend lands on calmer weather, expect both sectors to return to Nov-or-better levels automatically.
+The driver is over-loading the front into T3 this weekend. The fix is brake-pedal *modulation*, not brake reference point — bring peak brake down from 93% toward 70–75% on the next session at T3 and see if apex speed and lat G come back up.
+
+### 2. T16 Hog Pen entry — revert to the Nov brake reference (target: clip 0.05–0.08s in S9)
+
+**Current:** L24 brake onset 55.5m, trail past apex 35.9m, peak lat G 0.79.
+**Reference:** Nov L27 brake onset 62.7m, trail 32.1m, peak lat G 0.86 — **earlier brake, less trail, more grip used.**
+
+The later brake / more trail experiment at T16 didn't produce more apex speed *or* more grip. Move brake onset back to ~62m and shorten the trail to ~32m, matching Nov.
+
+### 3. Stretch Sat-2's pace into the rest of Saturday
+
+Sat-2 fast lap (2:18.019) was 1.9s faster than Sat-3 (2:19.901) and 4.2s faster than Sat-4 (2:22.210) — Saturday's pace went *backward* after the day's peak. The telemetry can't explain what was special about Sat-2 (tire temps, traffic, weather window) — that's a subjective debrief item. Data signal that it's working next time: Sat-3 / Sat-4 fast laps landing within 1s of the day's best instead of 2–4s off.
 
 ---
 
 ## What to Keep Doing
 
-- **The increased commitment in lateral-grip corners** — Peak lat G 1.21 → 1.33, Peak decel G 0.84 → 1.08 vs Nov, on a worse-aged tire set. That's pure technique. T9 +3.9 mph apex is the showcase.
-- **South Bend line change** — already paid 0.240 s. The 13.080 s S5 optimum is the new baseline.
-- **Smoother hands** — Steer RMS 113 → 102 on the best lap. Cleaner inputs and faster lap times together usually means the driver is "more in flow."
-- **Day-to-day consistency** — 0.135 s between D1 and D2 bests (vs Nov's 2.551 s). The car is producing its ceiling on both days now, not just the warm one.
+- **Esses (T7/T8/T9) — apex speeds gained +4.5 / +1.2 / +3.9 mph vs Nov.** Series-best apex now belongs here. Whatever you're doing through the high-speed left sequence is working.
+- **South Bend (T10) — +2.0 mph apex vs Nov, sector −0.240s.** Now the series-best.
+- **Snake (T5b → T6a → T6b) — every apex marginally up, sector −0.036s.** The high-grip flow is solid.
+- **Oak Tree (T11/T12) — sector −0.064s, T12 apex +0.4 mph.** Brake-and-rotate technique here is dialed in.
+- **NASCAR sector S2 −0.106s** despite the T3 brake-pressure issue — the rest of S2 is finding time.
 
 ---
 
-## Series Baseline
+## Series Baseline (updated after this weekend)
 
-| Weekend | Tires | Conditions | Best | Optimal | Gap |
-|---|---|---|---|---|---|
-| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (31 → 37 °F) | 2:18.888 | 2:17.378 | +1.510 |
-| **2025-12-13-14** | **Nankang CR-S (6–10 cycles)** | **Cold dry + D2 18.6 mph wind** | **2:17.884** | **2:16.692** | **+1.192** |
+| # | Sector | Best (s) | Source |
+|---|---|---|---|
+| 1 | T1 | **14.201** | L22 @ 2025-12-14 |
+| 2 | NASCAR | **16.401** | L21 @ 2025-12-13 |
+| 3 | Snake | **9.084** | L24 @ 2025-12-14 |
+| 4 | Esses | **19.100** | L24 @ 2025-12-14 |
+| 5 | South Bend | **13.080** | L14 @ 2025-12-14 |
+| 6 | Oak Tree | **3.656** | L12 @ 2025-12-13 |
+| 7 | Back Straight | 29.080 | Nov, 2025-11-30 |
+| 8 | Roller Coaster | 6.560 | Nov, 2025-11-30 |
+| 9 | Hog Pen | **11.889** | L12 @ 2025-12-13 |
+| 10 | Front Straight | 13.438 | Nov, 2025-11-30 |
+| — | **Best lap** | **2:17.884** | L24 @ 2025-12-14 |
+| — | Optimum | **2:16.692** | sum |
 
-Two weekends in: 1.004 s of best-lap progression on the same compound (older). Gap to optimum tightened from 1.51 s → 1.19 s. Six of nine non-straight sectors set new series bests this weekend. Watch for the next weekend whether the T17 commit step (60% → 95% on the best lap) lands; that's the headline target Carrying across.
+**This weekend now owns 7 of 10 sectors, best lap, and optimum.** Nov keeps the three straight-line sectors (S7, S8, S10) — directly attributable to Sunday's wind.
 
 ---
 
-## Data-Quality Notes
+## Data Quality Notes
 
-- **No CAN dropouts this weekend** — every lap's pedal data is usable. Big improvement vs Nov where 4 laps (incl. Day 1 best) were unusable for technique.
-- **D2 L7/L8 yellow flag**: 3:50 and 3:57 lap times with 76 mph top speed in segment S1 — almost certainly a course-wide yellow. Correctly excluded as off-pace; ignore for analysis.
-- **Tire pressures still unrecorded.** Strongly recommend capturing cold pressures next weekend — would let us reason about understeer/oversteer balance at S6 Oak Tree and the new brake-and-rotate technique.
-- **Day 2 wind direction (335° / 18.6 mph)** is the new variable this weekend. Note it explicitly when comparing future weekends' front/back-straight times against Dec 14.
+- **Sunday's Sun-2 (L7–L9) was a parade / full-course yellow** — lap times 3:50 / 3:57 with max speed 76–77 mph. Excluded from on-pace stats automatically. Not a driver issue.
+- **Sunday wind (11.7 mph NNW)** was 7.4 mph stronger than Saturday and likely cost 0.10–0.20s on the straights. All 3 sector regressions vs Nov are on straight-line sectors. The corner-sector improvements are *despite* the wind, not because of it — those are real technique gains.
+- **No CAN-dropout flagged laps** this weekend. Pedal/steering data on every on-pace lap is valid.
+- **Tire context:** Same Nankang CR-S set as Nov, now ~6–10 heat cycles (was 4–7). The peak-grip envelope hasn't materially changed at these temperatures; pace gains aren't attributable to tire freshness.
