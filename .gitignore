@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# uv
+.python-version
+
+# Session data (telemetry is large + personal)
+sessions/*.parquet
+sessions/*.meta.json
+sessions/manifest.json
+sessions/weather_cache.json
+
+# Generated reports: ignore everything except the Claude-authored coaching summaries.
+# The per-session deep dives, weekend rollups, comparisons, and progression are all
+# regenerated from the parquet files on every import, so they don't need to be tracked.
+reports/**
+!reports/
+!reports/**/
+!reports/**/coaching_*.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
