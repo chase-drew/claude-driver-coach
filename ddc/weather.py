@@ -1,8 +1,11 @@
 """Open-Meteo historical weather client with on-disk caching.
 
-We use Open-Meteo's free `archive-api` endpoint, which serves ERA5 reanalysis
-for past dates and ICON/GFS for the recent past. It accepts a lat/lon and a
-date range and returns hourly data. We round the requested timestamp to the
+We prefer Open-Meteo's free `historical-forecast-api` endpoint for recent past
+dates — it backfills with measured/assimilated data within ~1 day of the event
+and reports actual precipitation, unlike the pure `forecast` endpoint which is
+a forward-looking model prediction. We fall back to the `archive-api` (ERA5
+reanalysis, ~5-day lag) for older dates, and finally to `forecast` for very
+recent or future-dated test data. We round the requested timestamp to the
 nearest hour and cache the response keyed by (lat, lon, hour) so repeated
 imports never re-fetch.
 """
@@ -18,6 +21,7 @@ import requests
 
 
 ARCHIVE_URL = "https://archive-api.open-meteo.com/v1/archive"
+HISTORICAL_FORECAST_URL = "https://historical-forecast-api.open-meteo.com/v1/forecast"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"  # for very recent / future-dated test data
 HOURLY_VARS = [
     "temperature_2m",
@@ -169,12 +173,27 @@ def fetch_weather(
         source="unavailable",
     )
 
-    # Archive endpoint covers most past dates; recent or future ones need forecast.
-    age_days = (datetime.now(timezone.utc) - hour).days
-    endpoints = [(ARCHIVE_URL, "open-meteo-archive")] if age_days > 5 else [
-        (FORECAST_URL, "open-meteo-forecast"),
-        (ARCHIVE_URL, "open-meteo-archive"),
-    ]
+    # Pick endpoint priority based on how recent the date is:
+    #   * For any past date, try historical-forecast first — it reports observed
+    #     precipitation/wind once the model has been re-run with assimilated data
+    #     (usually within ~1 day). Archive (ERA5 reanalysis) is the next-best
+    #     measured source but lags by ~5 days. Pure forecast is the last resort.
+    #   * For dates within the last day or in the future, the historical-forecast
+    #     and archive endpoints may not yet have data; forecast is the only
+    #     option.
+    age_seconds = (datetime.now(timezone.utc) - hour).total_seconds()
+    if age_seconds > 86400:  # older than 1 day → assimilated data should exist
+        endpoints = [
+            (HISTORICAL_FORECAST_URL, "open-meteo-historical-forecast"),
+            (ARCHIVE_URL, "open-meteo-archive"),
+            (FORECAST_URL, "open-meteo-forecast"),
+        ]
+    else:
+        endpoints = [
+            (FORECAST_URL, "open-meteo-forecast"),
+            (HISTORICAL_FORECAST_URL, "open-meteo-historical-forecast"),
+            (ARCHIVE_URL, "open-meteo-archive"),
+        ]
 
     last_err: str = ""
     for url, source in endpoints:
