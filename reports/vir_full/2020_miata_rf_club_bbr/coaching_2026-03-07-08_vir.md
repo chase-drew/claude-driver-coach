@@ -14,9 +14,9 @@
 | Air temp (session start) | 24.8 °C / 77 °F | 19.7 °C / 67 °F |
 | Humidity | 58% | **75%** |
 | Cloud / precip | 40% cloud, dry | **99% cloud, dry** |
-| Wind | 26 km/h @ 210° (SW) | 19 km/h @ 234° (SW) |
+| Wind | 16.2 mph @ 210° (SW) | 11.8 mph @ 234° (SW) |
 
-**Two big changes vs every prior weekend.** Conditions: 20–25 °C vs Nov/Dec's −0.6 to 3.3 °C — a 20 °C jump. Tire: switched from Nankang CR-S (the only compound the series had data on) to Hankook Ventus RS4 with only 4–6 heat cycles on it. **Treat almost every per-corner delta vs prior weekends as some mix of tire-compound transition and driver learning — not technique regression.**
+**Two big changes vs every prior weekend.** Conditions: 68–77 °F vs Nov/Dec's 31–38 °F — a 36 °F jump. Tire: switched from Nankang CR-S (the only compound the series had data on) to Hankook Ventus RS4 with only 4–6 heat cycles on it. **Treat almost every per-corner delta vs prior weekends as some mix of tire-compound transition and driver learning — not technique regression.**
 
 Day 1 was a late-afternoon session (14:47 start). Day 2 was the cooler, cloudier, more humid morning session — and the faster day, suggesting either the tires preferred the cooler air or the rubber from Day 1 helped.
 
@@ -174,9 +174,9 @@ South Bend line (T10 apex up 2.6–4.6 mph across the series), T11 brake-and-rot
 
 | Weekend | Tires | Conditions | Best | Optimal | Gap |
 |---|---|---|---|---|---|
-| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (−0.6 → 3 °C) | 2:18.888 | 2:17.378 | +1.510 |
-| 2025-12-13-14 | Nankang CR-S (6–10 cycles) | Cold dry, D2 wind | **2:17.884** | **2:16.692** | +1.192 |
-| **2026-03-07-08** | **Hankook Ventus RS4 (4–6 cycles)** | **Warm dry (20 → 25 °C)** | 2:21.408 | 2:19.877 | +1.531 |
+| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (31 → 37 °F) | 2:18.888 | 2:17.378 | +1.510 |
+| 2025-12-13-14 | Nankang CR-S (6–10 cycles) | Cold dry, D2 18.6 mph wind | **2:17.884** | **2:16.692** | +1.192 |
+| **2026-03-07-08** | **Hankook Ventus RS4 (4–6 cycles)** | **Warm dry (68 → 77 °F)** | 2:21.408 | 2:19.877 | +1.531 |
 
 Three weekends. **The series-best best-lap and optimal both still belong to Dec on the Nankang CR-S.** The Hankook RS4 either needs more heat cycles, different pressures, or simply doesn't match the CR-S's peak grip on this car at this track. The next weekend on this tire will tell you which.
 

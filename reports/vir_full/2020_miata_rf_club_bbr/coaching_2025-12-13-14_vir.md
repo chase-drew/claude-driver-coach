@@ -14,9 +14,9 @@
 | Air temp (session start) | 3.3 °C / 38 °F | 1.1 °C / 34 °F |
 | Humidity | 63% | 48% |
 | Cloud / precip | 58% cloud, dry | 37% cloud, dry |
-| Wind | 7 km/h @ 238° (light SW) | **30 km/h @ 335° (strong NW)** |
+| Wind | 4.3 mph @ 238° (light SW) | **18.6 mph @ 335° (strong NW)** |
 
-Cold dry both days, similar to Nov. Day 2's **30 km/h NW wind is the big new variable** — VIR's front and back straights run roughly N–S, so a 335° wind puts a meaningful headwind component on the front straight when heading north. This shows up clearly in the sector deltas vs Nov (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s — the only two sectors that got slower vs Nov, both straights). Treat those two straight-line regressions as wind, not technique.
+Cold dry both days, similar to Nov. Day 2's **18.6 mph NW wind is the big new variable** — VIR's front and back straights run roughly N–S, so a 335° wind puts a meaningful headwind component on the front straight when heading north. This shows up clearly in the sector deltas vs Nov (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s — the only two sectors that got slower vs Nov, both straights). Treat those two straight-line regressions as wind, not technique.
 
 ---
 
@@ -82,7 +82,7 @@ L24 owns S3 Snake ★ and S4 Esses ★ outright. **Five of the 10 sector optima 
 | 9 | S9 Hog Pen | 11.889 | 12.000 | **−0.111** | −0.93% |
 | 10 | S10 Front Straight | 13.581 | 13.438 | +0.143 | +1.06% |
 
-**Eight of ten sectors improved.** The two regressions (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s) are both straight-line, both on Day 2 wind day — almost certainly the 30 km/h NW headwind. Same tires, same compound, same driver, more cycles — the cornering improvements have to be technique + (slightly) warmer conditions, not the tires (which are *more* worn than Nov).
+**Eight of ten sectors improved.** The two regressions (S7 Back Straight +0.047 s, S10 Front Straight +0.143 s) are both straight-line, both on Day 2 wind day — almost certainly the 18.6 mph NW headwind. Same tires, same compound, same driver, more cycles — the cornering improvements have to be technique + (slightly) warmer conditions, not the tires (which are *more* worn than Nov).
 
 **Per-corner apex-speed gains** (top 5): T9 Esses **+3.9 mph**, T5a t4_t5a **+2.3 mph**, T10 South Bend **+2.0 mph**, T5b Snake +1.3 mph, T8 Esses +1.2 mph. All lateral-grip corners. The driver is using more of the tire than in Nov.
 
@@ -159,7 +159,7 @@ L24 → 60% throttle at T17 apex. **L21 ran 95%** on a 2:18.187 lap. The techniq
 L12 D1 owns Oak Tree, Back Straight, Roller Coaster, and Hog Pen sector optima. L24 D2 owns Snake and Esses. **No single lap combined them.** Watch L12's S6→S9 line vs L24's and find what L12 was doing different — likely a different braking point at T11 or a smoother T16 exit. The data is in the per-corner traces.
 
 ### 3. Don't over-correct the wind-related straight-line losses
-S7 Back Straight and S10 Front Straight each got slightly slower vs Nov — the only two sectors that did. Day 2 had 30 km/h NW headwind on the front straight. **This is not a technique problem. Don't change anything to chase it.** When the next weekend lands on calmer weather, expect both sectors to return to Nov-or-better levels automatically.
+S7 Back Straight and S10 Front Straight each got slightly slower vs Nov — the only two sectors that did. Day 2 had 18.6 mph NW headwind on the front straight. **This is not a technique problem. Don't change anything to chase it.** When the next weekend lands on calmer weather, expect both sectors to return to Nov-or-better levels automatically.
 
 ---
 
@@ -176,8 +176,8 @@ S7 Back Straight and S10 Front Straight each got slightly slower vs Nov — the 
 
 | Weekend | Tires | Conditions | Best | Optimal | Gap |
 |---|---|---|---|---|---|
-| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (-0.6 → 3 °C) | 2:18.888 | 2:17.378 | +1.510 |
-| **2025-12-13-14** | **Nankang CR-S (6–10 cycles)** | **Cold dry + D2 30 km/h wind** | **2:17.884** | **2:16.692** | **+1.192** |
+| 2025-11-29-30 | Nankang CR-S (4–7 cycles) | Cold dry (31 → 37 °F) | 2:18.888 | 2:17.378 | +1.510 |
+| **2025-12-13-14** | **Nankang CR-S (6–10 cycles)** | **Cold dry + D2 18.6 mph wind** | **2:17.884** | **2:16.692** | **+1.192** |
 
 Two weekends in: 1.004 s of best-lap progression on the same compound (older). Gap to optimum tightened from 1.51 s → 1.19 s. Six of nine non-straight sectors set new series bests this weekend. Watch for the next weekend whether the T17 commit step (60% → 95% on the best lap) lands; that's the headline target Carrying across.
 
@@ -188,4 +188,4 @@ Two weekends in: 1.004 s of best-lap progression on the same compound (older). G
 - **No CAN dropouts this weekend** — every lap's pedal data is usable. Big improvement vs Nov where 4 laps (incl. Day 1 best) were unusable for technique.
 - **D2 L7/L8 yellow flag**: 3:50 and 3:57 lap times with 76 mph top speed in segment S1 — almost certainly a course-wide yellow. Correctly excluded as off-pace; ignore for analysis.
 - **Tire pressures still unrecorded.** Strongly recommend capturing cold pressures next weekend — would let us reason about understeer/oversteer balance at S6 Oak Tree and the new brake-and-rotate technique.
-- **Day 2 wind direction (335° / 30 km/h)** is the new variable this weekend. Note it explicitly when comparing future weekends' front/back-straight times against Dec 14.
+- **Day 2 wind direction (335° / 18.6 mph)** is the new variable this weekend. Note it explicitly when comparing future weekends' front/back-straight times against Dec 14.

@@ -14,9 +14,9 @@
 | Air temp (session start) | -0.6 °C / 31 °F | 3.0 °C / 37 °F |
 | Humidity | 52% | 52% |
 | Cloud / precip | 76% cloud, dry | 100% cloud, dry |
-| Wind | 4 km/h @ 5° | 7 km/h @ 200° |
+| Wind | 2.5 mph @ 5° | 4.3 mph @ 200° |
 
-Both days started cold and overcast. Day 2 was 3.5 °C warmer with rubber laid down from Day 1's 26 laps — that combination, not technique, explains most of the day-over-day gain. On a heat-cycled CR-S at 31 °F, the first 8–10 laps will be tire warm-up, and lateral grip stays the dominant limiter all session.
+Both days started cold and overcast. Day 2 was 6.3 °F warmer with rubber laid down from Day 1's 26 laps — that combination, not technique, explains most of the day-over-day gain. On a heat-cycled CR-S at 31 °F, the first 8–10 laps will be tire warm-up, and lateral grip stays the dominant limiter all session.
 
 ---
 
@@ -187,7 +187,7 @@ L26 (2:22.431, +3.5 s overall) ran S5 in **13.320 s** vs L27's 13.540 s. Slower 
 
 | Weekend | Tires | Conditions | Best | Optimal | Gap |
 |---|---|---|---|---|---|
-| **2025-11-29-30** | Nankang CR-S (4–7 cycles) | Cold dry (-0.6 → 3 °C) | **2:18.888** | 2:17.378 | +1.510 s |
+| **2025-11-29-30** | Nankang CR-S (4–7 cycles) | Cold dry (31 → 37 °F) | **2:18.888** | 2:17.378 | +1.510 s |
 
 This is the **baseline weekend**. Two things to watch as more weekends arrive: (1) does the T17 throttle hesitation persist across weekends, or was it a cold-day caution, and (2) how do the lateral-grip-dependent apex speeds (Esses, Roller Coaster) move on a warmer day or stickier tire — those are the corners that'll move first.
 
