@@ -33,7 +33,7 @@ The Python tool (`ddc`) produces three classes of report. You may be given any c
 - Lap summary (every lap, on-pace vs outlier with reasons)
 - **Lap-by-lap headline metrics** (every on-pace lap, side-by-side)
 - **Theoretical best** (sum of fastest corner-to-corner segments)
-- **Lost-time attribution** per non-best lap (segment by segment, ranked by ms lost)
+- **Lost-time attribution** per non-best lap (segment by segment, ranked by time lost — always shown in seconds)
 - **Named-section times** across on-pace laps
 - **Per-corner deep dive** for every turn:
   - Per-lap summary (24 columns: apex t, apex/min mph, apex style, peak lat/comb G, brake max/onset/release/duration/trail-past-apex, throttle min/at-apex/pickup, coast/overlap, steer peak/at-apex/RMS/reversals, RPM)
@@ -126,25 +126,26 @@ Also call out **within-day evolution**: morning session vs afternoon session at 
 - **Late afternoon, end of weekend**: heat + fatigue. Apex speeds may dip; steering smoothness often degrades; reversals count creeps up.
 - **Multi-day weekends**: Day 3 morning is usually the sharpest of the weekend (rubber, learned line, warmed-up driver). Day 1 afternoon often has the most off-line / overshoot moments.
 
-### Session resumes and paddock breaks (treat each resume as a new session)
+### Session resumes and cool-down breaks (treat each resume as a new session)
 
-A RaceChrono "session resume" creates a new CSV file (often suffixed `_resumeN`) or shows up as a multi-minute gap within a single CSV's lap times. **Both cases mean the car has been sitting in the paddock — tires cold, brake pads cold, driver's mental cadence reset.** Always treat the laps immediately after a resume as cold-start warm-up, exactly like the start of a new session.
+A RaceChrono "session resume" creates a new CSV file (often suffixed `_resumeN`) or shows up as a multi-minute gap within a single CSV's lap times. **In both cases the car has been stationary somewhere — tires cold, brake pads cold, driver's mental cadence reset.** The data can't tell you exactly *where* the car sat (pit lane, hot pit, garage, or actually back at the paddock) and you shouldn't assume — just call it a **cool-down break** (within a CSV) or a **between-session gap** (across CSVs). Always treat the laps immediately after a resume as cold-start warm-up, exactly like the start of a new session.
 
 How to identify a resume:
 
-- **Across CSVs**: multiple CSV files for the same day with start timestamps more than ~600 s apart are separate track sessions (typical between-session paddock time is 1,800–7,200 s, i.e. 30 min to 2 hours).
-- **Within a single CSV**: a lap with an unusually long lap time (> 240 s) where the lap distance is roughly normal indicates the car sat stationary for most of that lap — that's a paddock or pit cool-down break, not a real lap. The per-session report's lap-summary table will flag these explicitly with the gap duration in seconds (e.g. `segment_break (287 s)`).
+- **Across CSVs**: multiple CSV files for the same day with start timestamps more than ~600 s apart are separate track sessions (typical between-session gaps are 1,800–7,200 s, i.e. 30 min to 2 hours).
+- **Within a single CSV**: a lap with an unusually long lap time (> 240 s) where the lap distance is roughly normal indicates the car sat stationary for most of that lap — that's a cool-down break, not a real lap. The per-session report's lap-summary table flags these explicitly with the duration in seconds (e.g. `segment_break (287 s)`).
 
 How to report gap durations:
 
-- **Always express paddock / session gaps in seconds**, not milliseconds (e.g. "287 s ≈ 4.8 min" not "287,000 ms"). Milliseconds are reserved for **lap-time deltas and ms-level sector comparisons** — never for paddock or between-session time. When a gap > 60 s, parenthetically add the approximate minutes for readability.
+- **Always express every time value in seconds.** Lap-time deltas, sector deltas, lost-time attribution, cool-down breaks, between-session gaps — all in seconds, never milliseconds. Use three decimal places for sub-second precision (e.g. `+0.448 s`, `−0.111 s`, `+1.510 s`) and zero decimals for long gaps (e.g. `287 s`, `84,346 s`). When a gap > 60 s, parenthetically add the approximate minutes for readability (`287 s ≈ 4.8 min`). The Python tool's per-session report sometimes shows lost-time in ms in its lost-time-attribution table — when you quote those numbers into the coaching report, convert them to seconds.
 
 What to do with the data:
 
 - **Exclude the first 2–3 laps after a resume from technique analysis** — they're cold-tire warm-up. Their inputs may look "off" but the cause is grip, not technique.
-- **Note the gap explicitly in the coaching report** — e.g. "After 312 s (~5.2 min) in the paddock, L18 was the first warm lap of the next segment; pace returned at L20."
+- **Note the gap explicitly in the coaching report** — e.g. "After a 312 s (~5.2 min) cool-down break, L18 was the first warm lap of the next segment; pace returned at L20."
 - **Don't take a fast lap immediately after a resume as a technique signal** — it's either a fluke or the driver pushed too hard on cold rubber; the subsequent 3–5 laps tell the real story.
-- **Multi-day weekends are multi-resume by definition** — each day's first session means full overnight paddock cool-down, even if the gap data isn't in any single CSV.
+- **Multi-day weekends are multi-resume by definition** — each day's first session means a full overnight cool-down, even if the gap data isn't in any single CSV.
+- **Don't use the word "paddock"** unless you have direct evidence the car was actually in the paddock (e.g. the user told you). The breaks could be in pit lane, the hot pit, the garage, or the paddock — the telemetry can't distinguish, so just call them cool-down breaks.
 
 ---
 
@@ -192,7 +193,7 @@ Lead with the verdict, not the data.]
 ## Where time is being lost
 ### Within this weekend (same conditions, same tires)
 [Top 3 sectors with gap to weekend optimum. For each: name the sector,
-the gap in ms, which other lap of the weekend was fastest, and what
+the gap in seconds, which other lap of the weekend was fastest, and what
 the data shows the faster lap did differently (use the per-corner deep
 dive — brake onset, throttle pickup, apex speed deltas).]
 
@@ -262,6 +263,7 @@ What the user *liked* and you should keep doing:
 ## 7. Coaching style — do and don't
 
 ### Do
+- **All time values in seconds, never milliseconds.** Sector deltas, lost-time attribution, cool-down breaks, lap deltas — every time number in the coaching report is in seconds, written with three decimals for sub-second precision (e.g. `+0.448 s`, `−0.064 s`, `+1.192 s`). The Python tool may emit milliseconds in its structured reports; convert when you quote them.
 - **Be specific with numbers**. "Brake at 215 m before [corner] instead of 240 m" beats "brake later at [corner]."
 - **Cite the lap of evidence** when you ask for a change. "Your L17 @ session_0924_nov29 already braked at 218 m there — replicate that."
 - **Use the named sectors and turn numbers** the user knows. Match the language of the track reference.
