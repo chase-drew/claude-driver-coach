@@ -104,13 +104,15 @@ When tires changed, **lead with the change** in your coaching: "You switched fro
 
 ### Weather
 
+> **Units:** Always use **°F** for temperatures and **mph** for wind speeds in coaching reports. Never write km/h or °C-only values in output text.
+
 Weather is fetched per-CSV from Open-Meteo (air temp, humidity, cloud cover, wind, precipitation, surface pressure).
 
 - **Cold air (< 50°F / 10°C)**: dense air = more power, but tires take longer to come up to temperature. Early-session lap times are conservative; the driver isn't slow, they're warming. Look for the "fast window" (often laps 10–25 on cold mornings).
 - **Hot air (> 85°F / 30°C)**: tires can be over-temp; second half of session usually drops off. Best lap is often in the first 5–8 minutes after the tires hit working temp.
 - **Wet or actively raining (precipitation > 0)**: grip is dramatically lower. Don't compare apex speeds or peak Gs to dry weekends. *Inputs* still matter — smoothness becomes the dominant skill.
 - **Damp but not raining (high humidity, recent precipitation, cool track)**: lap times will be 3–8 s off dry. Rubber laid down across the day matters more than weather on these days.
-- **Wind**: > 25 km/h gusts affect commitment at high-speed corners and braking stability. Note wind direction relative to the track — a tail wind into a fast corner can shift apex commitment requirements; a head wind into a heavy braking zone makes the brake reference easier and the throttle-out harder.
+- **Wind**: > 15.5 mph gusts affect commitment at high-speed corners and braking stability. Note wind direction relative to the track — a tail wind into a fast corner can shift apex commitment requirements; a head wind into a heavy braking zone makes the brake reference easier and the throttle-out harder.
 
 ### Track evolution (rubber)
 
