@@ -24,6 +24,7 @@ from .laps import classify_outliers, detect_laps
 from .parser import parse_csv, session_start_latlon, session_start_utc
 from .refs import list_cars, list_tracks
 from .report import (
+    write_coaching_inputs,
     write_progression_report,
     write_session_report,
     write_weekend_comparison_report,
@@ -47,8 +48,16 @@ console = Console()
 
 @click.group(context_settings={"help_option_names": ["-h", "--help"]})
 @click.version_option(__version__, "--version", "-V")
-def cli() -> None:
+@click.option(
+    "--no-progress",
+    is_flag=True,
+    help="Suppress the progress bars in long-running commands (useful when piping output).",
+)
+def cli(no_progress: bool) -> None:
     """Track-day telemetry → Markdown for AI-assisted driver coaching."""
+    if no_progress:
+        from .progress import disable_progress
+        disable_progress()
 
 
 # ---------------------------------------------------------------------------
@@ -401,6 +410,17 @@ def cmd_compare(track_slug: str, car_slug: str, weekend_id: str) -> None:
     console.print(f"[green]Wrote[/green] {path}")
 
 
+@cli.command("coaching-inputs")
+@click.argument("track_slug")
+@click.argument("car_slug")
+@click.argument("weekend_id")
+def cmd_coaching_inputs(track_slug: str, car_slug: str, weekend_id: str) -> None:
+    """Generate ``coaching_inputs_<weekend>.md`` — the lean, source-cited file used
+    as the single input for the coaching writeup."""
+    path = write_coaching_inputs(track_slug, car_slug, weekend_id)
+    console.print(f"[green]Wrote[/green] {path}")
+
+
 # ---------------------------------------------------------------------------
 # import-weekend (batch import + automatic comparison)
 # ---------------------------------------------------------------------------
@@ -527,6 +547,11 @@ def cmd_import_weekend(
         console.print(f"  progression → {pp}")
     except Exception as e:  # noqa: BLE001
         console.print(f"  [yellow]progression skipped: {e}[/yellow]")
+    try:
+        ci = write_coaching_inputs(track_slug, car_slug, weekend_id)
+        console.print(f"  coaching inputs → {ci}")
+    except Exception as e:  # noqa: BLE001
+        console.print(f"  [yellow]coaching inputs skipped: {e}[/yellow]")
 
     console.print("")
     console.print(f"[bold green]Done.[/bold green] Imported {len(imported_session_ids)} session(s) for weekend `{weekend_id}`.")

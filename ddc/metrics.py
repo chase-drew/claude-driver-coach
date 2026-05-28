@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 
 from .laps import Lap
-from .refs import Sector, TrackRef, Turn
+from .refs import CarRef, Sector, TrackRef, Turn
 
 
 EARTH_RADIUS_M = 6_371_000.0
@@ -63,6 +63,8 @@ class TurnPassage:
     steering_smoothness: float          # RMS of steering rate (deg/s); lower = smoother
     steering_reversals: int             # sign changes in steering rate within the window
     rpm_at_apex: float
+    gear_at_apex: int                   # inferred gear at apex (1..6); 0 if undetermined (no ratios or transition)
+    gear_entry: int                     # gear at window start (1..6); 0 if undetermined
     apex_row_in_lap: int                # row index of the apex sample within the lap segment (lap.slice(df).reset_index)
     window_row_start: int
     window_row_end: int
@@ -133,9 +135,138 @@ def haversine_array(lat: np.ndarray, lon: np.ndarray, lat0: float, lon0: float) 
 BRAKE_THRESH_PCT = 5.0     # treat brake_pos > 5% as "on brake"
 THROTTLE_THRESH_PCT = 5.0  # treat accelerator_pos > 5% as "on throttle"
 
+# Heel-toe rev-match detection. A brief throttle pulse during heavy braking, where the engine
+# RPM rises while the car is decelerating, is a downshift rev-match — correct technique, not
+# an inputs-overlap fault. We exclude such samples from the "overlap" metric so the headline
+# `% overlap` and corner-level `overlap_distance_m` only count *unintentional* throttle+brake.
+HEEL_TOE_BRAKE_PEAK_PCT = 20.0   # the overlap region must peak above this brake pressure
+HEEL_TOE_MAX_PULSE_MS   = 500.0  # heel-toe blips are brief; sustained two-pedal isn't this
+HEEL_TOE_MIN_RPM_RISE   = 150.0  # rev-match must add at least this many RPM
+HEEL_TOE_MIN_SPEED_DROP_MPH = 1.0  # car must be meaningfully decelerating across the window
+HEEL_TOE_CONTEXT_SAMPLES = 50    # samples (≈250 ms at 200 Hz) of pre/post context for RPM/speed
 
-def compute_lap_metrics(lap: Lap, df: pd.DataFrame, track: TrackRef) -> LapMetrics:
-    """Compute whole-lap and per-corner metrics for ``lap`` against ``track``."""
+
+# ---------------------------------------------------------------------------
+# Gear inference (no CAN gear sensor — we derive from speed/RPM ratio)
+# ---------------------------------------------------------------------------
+
+GEAR_MIN_RPM = 1500.0        # below this, engine is at idle / clutched in — gear undefined
+GEAR_MIN_MPH = 5.0           # below this, car is essentially stationary — gear undefined
+
+# Per-session gear calibration. Rolling diameter shifts with tire compound, pressure
+# (cold→hot), wear, and temperature — so the same gear can read ±3–5% different
+# mph_per_1000_rpm session to session. The calibrator widens nominal ratios by this
+# tolerance to gather samples for refinement.
+GEAR_CALIBRATION_TOLERANCE_PCT = 15.0
+GEAR_CALIBRATION_MIN_SAMPLES = 100   # below this, fall back to the nominal value for that gear
+
+
+def calibrate_gears(
+    speed_mps: pd.Series | None,
+    rpm: pd.Series | None,
+    nominal_gears: list,           # list[Gear] — typed as list to avoid circular import here
+    tolerance_pct: float = GEAR_CALIBRATION_TOLERANCE_PCT,
+    min_samples_per_gear: int = GEAR_CALIBRATION_MIN_SAMPLES,
+) -> list:
+    """Refine nominal gear ratios using actual session data.
+
+    For each nominal gear, scan samples whose mph/1000RPM ratio is within
+    ``±tolerance_pct`` of the nominal value, and take the median as the refined ratio.
+    Gears with too few in-band samples (sparse use during the session — e.g. 1st gear
+    on a flying-lap-only session) fall back to nominal. Returns a new list of
+    ``Gear`` objects in the same order as the input. Returns ``nominal_gears``
+    unchanged if speed/rpm signals are missing.
+    """
+    from .refs import Gear  # local import — avoids circular at module load
+    if speed_mps is None or rpm is None or not nominal_gears:
+        return list(nominal_gears)
+    if not (speed_mps.notna().any() and rpm.notna().any()):
+        return list(nominal_gears)
+    mph = (speed_mps * 2.2369363).to_numpy(dtype=float)
+    rp = rpm.to_numpy(dtype=float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratio = np.where((rp >= GEAR_MIN_RPM) & (mph >= GEAR_MIN_MPH), mph / rp * 1000.0, np.nan)
+    refined: list = []
+    for g in nominal_gears:
+        lo = g.mph_per_1000_rpm * (1.0 - tolerance_pct / 100.0)
+        hi = g.mph_per_1000_rpm * (1.0 + tolerance_pct / 100.0)
+        in_band = np.isfinite(ratio) & (ratio >= lo) & (ratio < hi)
+        if int(in_band.sum()) >= min_samples_per_gear:
+            refined.append(Gear(number=g.number, mph_per_1000_rpm=float(np.median(ratio[in_band]))))
+        else:
+            refined.append(g)
+    return refined
+
+
+def assign_gear(mph: float, rpm: float, boundaries: list[float]) -> int:
+    """Return the gear number (1..N) for a single (mph, RPM) sample.
+
+    ``boundaries`` is the ``CarRef.gear_boundaries()`` list — the geometric-mean ratios
+    between adjacent gears. Returns ``0`` if either input is missing, the car is too
+    slow / RPM too low to identify a gear reliably, or no boundaries are configured.
+    """
+    if not boundaries or not (mph and rpm and rpm >= GEAR_MIN_RPM and mph >= GEAR_MIN_MPH):
+        return 0
+    ratio = mph / rpm * 1000.0
+    gear = 1
+    for b in boundaries:
+        if ratio >= b:
+            gear += 1
+        else:
+            break
+    return gear
+
+
+def assign_gear_series(
+    speed_mps: pd.Series | None,
+    rpm: pd.Series | None,
+    boundaries: list[float],
+) -> pd.Series | None:
+    """Return a Series of gear numbers (1..N) aligned to the index of ``rpm``.
+
+    Samples without a clean gear (idle, stationary, missing CAN) are set to ``0``.
+    Returns ``None`` if any required input is missing entirely.
+    """
+    if speed_mps is None or rpm is None or not boundaries:
+        return None
+    if not (speed_mps.notna().any() and rpm.notna().any()):
+        return None
+    mph = (speed_mps * 2.2369363).to_numpy(dtype=float)
+    rp = rpm.to_numpy(dtype=float)
+    n = len(rp)
+    out = np.zeros(n, dtype=np.int8)
+    # Vectorised boundary comparison: count how many boundaries the ratio meets/exceeds.
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ratio = np.where((rp >= GEAR_MIN_RPM) & (mph >= GEAR_MIN_MPH), mph / rp * 1000.0, np.nan)
+    valid = np.isfinite(ratio)
+    for b in boundaries:
+        out[valid] += (ratio[valid] >= b).astype(np.int8)
+    out[valid] += 1   # base gear is 1; each boundary crossed adds one
+    return pd.Series(out, index=rpm.index)
+
+
+def compute_lap_metrics(
+    lap: Lap,
+    df: pd.DataFrame,
+    track: TrackRef,
+    car: CarRef | None = None,
+    gear_boundaries_override: list[float] | None = None,
+) -> LapMetrics:
+    """Compute whole-lap and per-corner metrics for ``lap`` against ``track``.
+
+    ``car`` is optional; when provided, gear ratios from the car reference are used
+    to infer gear at apex and lap-level gear-usage stats. Without it, gear fields
+    stay at their sentinel values (0 for "unknown").
+
+    ``gear_boundaries_override`` lets the caller pass a pre-computed list of gear
+    boundaries (e.g. from a session-level calibration of ``car.gears``) so every
+    lap in a session uses the same refined ratios rather than each lap re-deriving
+    them from its own (sparser) sample. Falls back to ``car.gear_boundaries()``.
+    """
+    if gear_boundaries_override is not None:
+        gear_boundaries = gear_boundaries_override
+    else:
+        gear_boundaries = car.gear_boundaries() if car is not None else []
     seg = lap.slice(df).reset_index(drop=True)
     lm = LapMetrics(lap=lap)
 
@@ -171,6 +302,19 @@ def compute_lap_metrics(lap: Lap, df: pd.DataFrame, track: TrackRef) -> LapMetri
     if len(on_brake) == len(on_throttle) and len(on_brake) > 0:
         coasting = (~on_brake) & (~on_throttle)
         overlap = on_brake & on_throttle
+        # Heel-toe rev-match downshifts intentionally apply throttle while braking; exclude
+        # those samples from "overlap" so the metric only counts unintentional two-pedal.
+        lap_gear_series = assign_gear_series(seg.get("gps_speed"), seg.get("canbus_rpm"), gear_boundaries)
+        ht_mask = _heel_toe_mask(
+            brake,
+            throttle,
+            seg.get("canbus_rpm"),
+            seg.get("gps_speed"),
+            seg.get("elapsed_time"),
+            gear_series=lap_gear_series,
+        )
+        if ht_mask is not None:
+            overlap = overlap & ~ht_mask.reindex(overlap.index).fillna(False).astype(bool)
         lm.pct_lap_coasting = float(coasting.mean() * 100.0)
         lm.pct_lap_overlap = float(overlap.mean() * 100.0)
 
@@ -220,7 +364,7 @@ def compute_lap_metrics(lap: Lap, df: pd.DataFrame, track: TrackRef) -> LapMetri
             for (turn, apex_idx, min_dist) in apex_indices:
                 turn_pos = track.turns.index(turn)
                 window_start, window_end = _expand_window(nearest_turn, apex_idx, turn_pos)
-                passage = _build_passage(turn, seg, apex_idx, window_start, window_end, lap.start_time_unix)
+                passage = _build_passage(turn, seg, apex_idx, window_start, window_end, lap.start_time_unix, gear_boundaries)
                 if passage is not None:
                     passage.min_distance_to_apex_m = min_dist
                     lm.passages.append(passage)
@@ -378,6 +522,7 @@ def _build_passage(
     win_start: int,
     win_end: int,
     lap_start_unix: float,
+    gear_boundaries: list[float] | None = None,
 ) -> TurnPassage | None:
     """Compute corner metrics within ``[win_start, win_end)`` of the lap segment."""
     win = seg.iloc[win_start:win_end]
@@ -446,12 +591,23 @@ def _build_passage(
     throttle_100_onset_m = _onset_distance(dist_signed, throttle, 98.0, before_apex=False)
     throttle_at_apex = float(throttle.iloc[apex_idx - win_start]) if (throttle is not None and (apex_idx - win_start) < len(throttle) and np.isfinite(throttle.iloc[apex_idx - win_start])) else float("nan")
 
-    # Coast and overlap distances within the window.
+    # Coast and overlap distances within the window. For overlap, exclude heel-toe
+    # rev-match samples — those are intentional downshift technique, not a two-pedal fault.
+    win_gear_series = assign_gear_series(win.get("gps_speed"), win.get("canbus_rpm"), gear_boundaries or [])
+    ht_mask = _heel_toe_mask(
+        brake,
+        throttle,
+        win.get("canbus_rpm"),
+        win.get("gps_speed"),
+        win.get("elapsed_time"),
+        gear_series=win_gear_series,
+    )
     coast_distance_m = _coast_overlap_distance(
         dist_signed, brake, throttle, BRAKE_THRESH_PCT, THROTTLE_THRESH_PCT, mode="coast"
     )
     overlap_distance_m = _coast_overlap_distance(
-        dist_signed, brake, throttle, BRAKE_THRESH_PCT, THROTTLE_THRESH_PCT, mode="overlap"
+        dist_signed, brake, throttle, BRAKE_THRESH_PCT, THROTTLE_THRESH_PCT,
+        mode="overlap", heel_toe_mask=ht_mask,
     )
 
     steer = win.get("canbus_steering_angle")
@@ -472,6 +628,21 @@ def _build_passage(
     rpm_at_apex = float("nan")
     if "canbus_rpm" in seg.columns and np.isfinite(seg["canbus_rpm"].iloc[apex_idx]):
         rpm_at_apex = float(seg["canbus_rpm"].iloc[apex_idx])
+
+    # Infer gear at window entry and at apex from speed/RPM. ``gear_boundaries`` is the
+    # ``CarRef.gear_boundaries()`` list — empty/None ⇒ unknown, leave both at 0.
+    gear_at_apex = 0
+    gear_entry = 0
+    if gear_boundaries and "canbus_rpm" in seg.columns:
+        rpm_series = seg["canbus_rpm"]
+        speed_ms = speed_series_full if speed_series_full is not None else None
+        if speed_ms is not None:
+            apex_mph = float(speed_ms.iloc[apex_idx]) * 2.2369363 if np.isfinite(speed_ms.iloc[apex_idx]) else float("nan")
+            apex_rpm = float(rpm_series.iloc[apex_idx]) if np.isfinite(rpm_series.iloc[apex_idx]) else float("nan")
+            gear_at_apex = assign_gear(apex_mph, apex_rpm, gear_boundaries)
+            entry_mph = float(speed_ms.iloc[win_start]) * 2.2369363 if np.isfinite(speed_ms.iloc[win_start]) else float("nan")
+            entry_rpm = float(rpm_series.iloc[win_start]) if np.isfinite(rpm_series.iloc[win_start]) else float("nan")
+            gear_entry = assign_gear(entry_mph, entry_rpm, gear_boundaries)
 
     # Window distance (meters covered between window start and end).
     window_distance = float("nan")
@@ -512,6 +683,8 @@ def _build_passage(
         steering_smoothness=steering_smooth,
         steering_reversals=steering_reversals,
         rpm_at_apex=rpm_at_apex,
+        gear_at_apex=gear_at_apex,
+        gear_entry=gear_entry,
         apex_row_in_lap=int(apex_idx),
         window_row_start=int(win_start),
         window_row_end=int(win_end),
@@ -593,6 +766,93 @@ def _signal_above_distance(
     return float(total)
 
 
+def _heel_toe_mask(
+    brake: pd.Series | None,
+    throttle: pd.Series | None,
+    rpm: pd.Series | None,
+    speed_mps: pd.Series | None,
+    elapsed_time: pd.Series | None,
+    gear_series: pd.Series | None = None,
+) -> pd.Series | None:
+    """Return a bool Series, True where the sample is inside a heel-toe rev-match event.
+
+    Heel-toe technique blips the throttle while heavy on the brake to rev-match a downshift.
+    Telemetry signature: a contiguous ``brake>5% AND throttle>5%`` region that is brief,
+    occurs at meaningful brake pressure, sees engine RPM rise (rev-match), and the car is
+    still decelerating across the event. If ``gear_series`` is provided, an event also
+    qualifies as heel-toe when the inferred gear *decreases* across the window — a more
+    definitive downshift signal than RPM-rise alone. Returns ``None`` if the required
+    signals are missing (caller should fall back to treating no samples as heel-toe).
+    """
+    if brake is None or throttle is None or rpm is None or speed_mps is None or elapsed_time is None:
+        return None
+    if not (brake.notna().any() and throttle.notna().any() and rpm.notna().any() and speed_mps.notna().any()):
+        return None
+
+    b = brake.fillna(0.0)
+    t = throttle.fillna(0.0)
+    overlap = (b > THROTTLE_THRESH_PCT) & (t > THROTTLE_THRESH_PCT)
+    mask = pd.Series(False, index=b.index)
+    if not overlap.any():
+        return mask
+
+    arr = overlap.to_numpy(dtype=np.int8)
+    diff = np.diff(np.concatenate([[0], arr, [0]]))
+    starts = np.where(diff == 1)[0]
+    ends = np.where(diff == -1)[0]
+    n = len(b)
+    if n == 0:
+        return mask
+
+    et = elapsed_time.to_numpy()
+    rp = rpm.to_numpy(dtype=float)
+    sp = speed_mps.to_numpy(dtype=float)
+    br = b.to_numpy(dtype=float)
+
+    gear_arr = gear_series.to_numpy(dtype=np.int8) if gear_series is not None else None
+
+    for s, e in zip(starts, ends):
+        if e <= s or e > n:
+            continue
+        dur_s = et[e - 1] - et[s] if (e - 1) < n else 0.0
+        if (dur_s * 1000.0) > HEEL_TOE_MAX_PULSE_MS:
+            continue
+        if np.nanmax(br[s:e]) < HEEL_TOE_BRAKE_PEAK_PCT:
+            continue
+        pre = max(0, s - HEEL_TOE_CONTEXT_SAMPLES)
+        post = min(n, e + HEEL_TOE_CONTEXT_SAMPLES)
+        # Speed must be falling across the window (true for any downshift under brakes).
+        spd_pre = sp[pre]
+        spd_post = sp[post - 1]
+        if not (np.isfinite(spd_pre) and np.isfinite(spd_post)):
+            continue
+        spd_drop_mph = (spd_pre - spd_post) * 2.2369363
+        if spd_drop_mph < HEEL_TOE_MIN_SPEED_DROP_MPH:
+            continue
+        # Confirm downshift via gear-drop if available; otherwise fall back to RPM-rise.
+        confirmed = False
+        if gear_arr is not None:
+            # Use gear values from outside the overlap region (the shift itself causes mid-shift
+            # ratios that read as a different gear). Sample a few cells before/after.
+            pre_gears = gear_arr[pre:s]
+            post_gears = gear_arr[e:post]
+            pre_g = int(np.max(pre_gears[pre_gears > 0])) if (pre_gears > 0).any() else 0
+            post_g = int(np.max(post_gears[post_gears > 0])) if (post_gears > 0).any() else 0
+            if pre_g > 0 and post_g > 0 and post_g < pre_g:
+                confirmed = True
+        if not confirmed:
+            rpm_pre = rp[pre]
+            rpm_peak = np.nanmax(rp[pre:post]) if post > pre else np.nan
+            if not (np.isfinite(rpm_pre) and np.isfinite(rpm_peak)):
+                continue
+            if (rpm_peak - rpm_pre) < HEEL_TOE_MIN_RPM_RISE:
+                continue
+        # All criteria met — mark this region as heel-toe rev-match.
+        mask.iloc[s:e] = True
+
+    return mask
+
+
 def _coast_overlap_distance(
     dist_signed: pd.Series,
     brake: pd.Series | None,
@@ -601,21 +861,28 @@ def _coast_overlap_distance(
     throttle_thresh: float,
     *,
     mode: str,
+    heel_toe_mask: pd.Series | None = None,
 ) -> float:
     """Meters traveled within the window where the driver is coasting or overlapping inputs.
 
     ``mode="coast"``: brake ≤ threshold AND throttle ≤ threshold.
-    ``mode="overlap"``: brake > threshold AND throttle > threshold.
+    ``mode="overlap"``: brake > threshold AND throttle > threshold, *excluding* heel-toe
+    rev-match samples when ``heel_toe_mask`` is provided.
     """
     if brake is None or throttle is None:
         return float("nan")
-    df = pd.DataFrame({"d": dist_signed.values, "b": brake.values, "t": throttle.values}).dropna().sort_values("d").reset_index(drop=True)
+    cols = {"d": dist_signed.values, "b": brake.values, "t": throttle.values}
+    if heel_toe_mask is not None:
+        cols["ht"] = heel_toe_mask.reindex(brake.index).fillna(False).to_numpy()
+    df = pd.DataFrame(cols).dropna(subset=["d", "b", "t"]).sort_values("d").reset_index(drop=True)
     if df.empty:
         return float("nan")
     if mode == "coast":
         flag = (df["b"] <= brake_thresh) & (df["t"] <= throttle_thresh)
     elif mode == "overlap":
         flag = (df["b"] > brake_thresh) & (df["t"] > throttle_thresh)
+        if "ht" in df.columns:
+            flag = flag & ~df["ht"].astype(bool)
     else:
         raise ValueError(f"unknown mode {mode}")
     total = 0.0

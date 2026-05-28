@@ -60,6 +60,14 @@ class TrackRef:
 
 
 @dataclass
+class Gear:
+    """A single forward gear, characterised by its measured `mph per 1000 RPM` ratio."""
+
+    number: int                 # 1..6
+    mph_per_1000_rpm: float     # speed (mph) the car travels at 1000 RPM in this gear
+
+
+@dataclass
 class CarRef:
     slug: str
     title: str
@@ -68,8 +76,24 @@ class CarRef:
     model: str
     trim: str
     mods: list[tuple[str, str]] = field(default_factory=list)
+    gears: list[Gear] = field(default_factory=list)  # empty if drivetrain section missing
     notes_markdown: str = ""
     source_path: Path | None = None
+
+    def gear_boundaries(self) -> list[float]:
+        """Return the boundaries (mph/1000RPM) between adjacent gears, in gear order.
+
+        A sample's ratio < boundaries[i] means it's in gear (i+1); ≥ means (i+2) or higher.
+        Uses the geometric mean of adjacent gear ratios as the boundary (correct for
+        multiplicative gear steps). Length is ``len(gears) - 1``.
+        """
+        if len(self.gears) < 2:
+            return []
+        sorted_g = sorted(self.gears, key=lambda g: g.number)
+        return [
+            (sorted_g[i].mph_per_1000_rpm * sorted_g[i + 1].mph_per_1000_rpm) ** 0.5
+            for i in range(len(sorted_g) - 1)
+        ]
 
 
 _TABLE_ROW_RE = re.compile(r"^\s*\|(.+)\|\s*$")
@@ -266,6 +290,27 @@ def load_car(path: str | Path) -> CarRef:
                     mods.append((cat, item))
             break
 
+    gears: list[Gear] = []
+    for heading, body in sections.items():
+        if heading.lower().startswith("drivetrain"):
+            rows = _parse_table(body[_first_table_index(body):])
+            if not rows:
+                break
+            header = [c.lower() for c in rows[0]]
+            for row in rows[1:]:
+                rec = dict(zip(header, row, strict=False))
+                gear_str = rec.get("gear", "").strip()
+                ratio_str = rec.get("mph_per_1000_rpm", "").strip()
+                try:
+                    gnum = int(gear_str)
+                    # ratio cell may include a parenthetical comment like "25.18 (extrapolated)"
+                    ratio_clean = re.match(r"\s*([0-9]+(?:\.[0-9]+)?)", ratio_str)
+                    if ratio_clean:
+                        gears.append(Gear(number=gnum, mph_per_1000_rpm=float(ratio_clean.group(1))))
+                except (ValueError, TypeError):
+                    continue
+            break
+
     notes_md = "\n".join(sections.get("Notes for analysis", [])).strip()
 
     return CarRef(
@@ -276,6 +321,7 @@ def load_car(path: str | Path) -> CarRef:
         model=model,
         trim=trim,
         mods=mods,
+        gears=sorted(gears, key=lambda g: g.number),
         notes_markdown=notes_md,
         source_path=path,
     )

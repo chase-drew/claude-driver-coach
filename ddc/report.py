@@ -16,19 +16,73 @@ Three report types:
 
 from __future__ import annotations
 
+import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Callable
 
 import numpy as np
 import pandas as pd
 
+
+# Parallelism: pandas/numpy release the GIL during the bulk of metric work, so threads
+# give real speedup without process-spawn overhead. Default to a sensible cap so we
+# don't drown the system on machines with many cores. Override via DDC_MAX_WORKERS.
+def _max_workers(limit: int | None = None) -> int:
+    try:
+        env_val = int(os.environ.get("DDC_MAX_WORKERS", "0"))
+    except ValueError:
+        env_val = 0
+    if env_val > 0:
+        return env_val
+    cpu = os.cpu_count() or 4
+    cap = min(8, cpu)
+    return min(cap, limit) if limit else cap
+
+
+def _parallel_map(
+    fn,
+    items,
+    *,
+    max_workers: int | None = None,
+    on_complete: Callable[[], None] | None = None,
+):
+    """Run ``fn`` over ``items`` in parallel via a thread pool, preserving order.
+
+    ``on_complete`` is invoked once after each item finishes (thread-safe — pass
+    a `progress_section` handle's `advance` here to drive a progress bar).
+    """
+    items = list(items)
+    if not items:
+        return []
+    workers = max_workers if max_workers else _max_workers(len(items))
+    if workers <= 1 or len(items) == 1:
+        results = []
+        for x in items:
+            r = fn(x)
+            if on_complete is not None:
+                on_complete()
+            results.append(r)
+        return results
+    with ThreadPoolExecutor(max_workers=workers) as ex:
+        future_to_idx = {ex.submit(fn, x): i for i, x in enumerate(items)}
+        results = [None] * len(items)
+        for fut in as_completed(future_to_idx):
+            results[future_to_idx[fut]] = fut.result()
+            if on_complete is not None:
+                on_complete()
+        return results
+
 from .laps import Lap, classify_outliers, detect_laps, format_lap_time, on_pace, session_best
+from .progress import progress_section, status_line
 from .metrics import (
     CornerDelta,
     FixedSectorTime,
     LapMetrics,
     TurnPassage,
+    calibrate_gears,
     compare_to_reference,
     compute_lap_metrics,
     corner_stats,
@@ -96,11 +150,23 @@ def write_session_report(session_id: str) -> Path:
     classify_outliers(laps)
     best = session_best(laps)
 
-    metrics_by_lap: dict[int, LapMetrics] = {}
-    lap_by_num: dict[int, Lap] = {}
-    for lap in on_pace(laps):
-        metrics_by_lap[lap.lap_number] = compute_lap_metrics(lap, df, track)
-        lap_by_num[lap.lap_number] = lap
+    # Calibrate gear ratios once per session against the actual data (handles tire
+    # pressure / compound / wear variance vs. the car MD's nominal ratios), then
+    # share the refined boundaries across every lap's metric computation.
+    calibrated_boundaries = _session_calibrated_boundaries(df, car)
+
+    on_pace_laps = list(on_pace(laps))
+    with progress_section(
+        f"Session {session_id}: computing {len(on_pace_laps)} on-pace lap metric(s)",
+        total=len(on_pace_laps),
+    ) as p:
+        lap_metrics_list = _parallel_map(
+            lambda lap: compute_lap_metrics(lap, df, track, car, gear_boundaries_override=calibrated_boundaries),
+            on_pace_laps,
+            on_complete=p.advance,
+        )
+    metrics_by_lap: dict[int, LapMetrics] = {lap.lap_number: lm for lap, lm in zip(on_pace_laps, lap_metrics_list)}
+    lap_by_num: dict[int, Lap] = {lap.lap_number: lap for lap in on_pace_laps}
     best_metrics = metrics_by_lap.get(best.lap_number) if best else None
 
     out_dir = report_dir_for(meta.track_slug, meta.car_slug)
@@ -504,15 +570,19 @@ def _render_corner_section(
     lines.append(
         "| Lap | Lap time | Apex t (s) | Apex mph | Min mph | Min-speed m from apex | Apex style | "
         "Peak latG | Peak combG | Brake max | Brake onset (m) | Brake release (m) | Brake dur (m) | Trail past apex (m) | "
-        "Throttle min | Throttle@apex | Throttle pickup (m) | Coast (m) | Overlap (m) | Steer peak | Steer@apex | Steer RMS | Reversals | RPM@apex |"
+        "Throttle min | Throttle@apex | Throttle pickup (m) | Coast (m) | Overlap (m) | Steer peak | Steer@apex | Steer RMS | Reversals | RPM@apex | Gear in→apex |"
     )
-    lines.append("|" + "---|" * 24)
+    lines.append("|" + "---|" * 25)
     for lap_num in sorted_laps:
         p = passages_for_turn.get(lap_num)
         if p is None:
             continue
         lap_obj = lap_by_num[lap_num]
         marker = "★" if lap_num == best_lap_number else ""
+        gear_cell = (
+            f"{p.gear_entry}→{p.gear_at_apex}" if p.gear_entry and p.gear_at_apex else
+            (f"{p.gear_at_apex}" if p.gear_at_apex else "—")
+        )
         lines.append(
             f"| L{lap_num}{marker} | {lap_obj.lap_time_str} | {_fmt(p.elapsed_in_lap_s, '.2f')} | "
             f"{_mph(p.speed_at_apex_mps)} | {_mph(p.min_speed_in_window_mps)} | "
@@ -525,7 +595,7 @@ def _render_corner_section(
             f"{_fmt(p.throttle_onset_m_after_apex, '.1f')} | {_fmt(p.coast_distance_m, '.1f')} | "
             f"{_fmt(p.overlap_distance_m, '.1f')} | {_fmt(p.steering_peak_deg, '.0f')}° | "
             f"{_fmt(p.steering_at_apex_deg, '+.0f')}° | {_fmt(p.steering_smoothness, '.0f')} | "
-            f"{p.steering_reversals} | {_fmt(p.rpm_at_apex, '.0f')} |"
+            f"{p.steering_reversals} | {_fmt(p.rpm_at_apex, '.0f')} | {gear_cell} |"
         )
     lines.append("")
 
@@ -626,13 +696,44 @@ class _SessionDigest:
     on_pace_std_s: float
 
 
-def _digest(session_id: str, track: TrackRef) -> _SessionDigest:
+def _session_calibrated_boundaries(df, car: CarRef | None) -> list[float] | None:
+    """Compute session-calibrated gear boundaries from the full session frame.
+
+    Returns ``None`` if the car has no gear ratios — caller will fall back to
+    whatever ``compute_lap_metrics`` does without an override (nominal ratios or
+    no-gear behavior). Returns a list of float boundaries (geometric means of
+    adjacent refined ratios) otherwise.
+    """
+    if car is None or not car.gears:
+        return None
+    speed = df.get("gps_speed")
+    rpm = df.get("canbus_rpm")
+    refined = calibrate_gears(speed, rpm, car.gears)
+    sorted_g = sorted(refined, key=lambda g: g.number)
+    if len(sorted_g) < 2:
+        return None
+    return [
+        (sorted_g[i].mph_per_1000_rpm * sorted_g[i + 1].mph_per_1000_rpm) ** 0.5
+        for i in range(len(sorted_g) - 1)
+    ]
+
+
+def _digest(
+    session_id: str,
+    track: TrackRef,
+    car: CarRef | None = None,
+    df: pd.DataFrame | None = None,
+    laps: list[Lap] | None = None,
+) -> _SessionDigest:
     meta = load_session_meta(session_id)
-    df = load_session_df(session_id)
-    laps = detect_laps(df)
-    classify_outliers(laps)
+    if df is None:
+        df = load_session_df(session_id)
+    if laps is None:
+        laps = detect_laps(df)
+        classify_outliers(laps)
     best = session_best(laps)
-    bm = compute_lap_metrics(best, df, track) if best else None
+    calibrated = _session_calibrated_boundaries(df, car)
+    bm = compute_lap_metrics(best, df, track, car, gear_boundaries_override=calibrated) if best else None
     pool = on_pace(laps)
     times = np.array([l.lap_time_s for l in pool]) if pool else np.array([])
     return _SessionDigest(
@@ -655,7 +756,15 @@ def write_weekend_report(track_slug: str, car_slug: str, weekend_id: str) -> Pat
         raise ValueError(f"No sessions match track={track_slug} car={car_slug} weekend={weekend_id}")
     entries.sort(key=lambda e: e.get("start_time_utc") or "")
 
-    digests = [_digest(e["session_id"], track) for e in entries]
+    with progress_section(
+        f"Weekend rollup — {weekend_id}: digesting {len(entries)} session(s)",
+        total=len(entries),
+    ) as p:
+        digests = _parallel_map(
+            lambda e: _digest(e["session_id"], track, car),
+            entries,
+            on_complete=p.advance,
+        )
     out_dir = report_dir_for(track_slug, car_slug)
     out_path = out_dir / f"weekend_{weekend_id}.md"
     md = _render_weekend_report(track, car, weekend_id, digests)
@@ -808,11 +917,22 @@ def write_progression_report(track_slug: str, car_slug: str) -> Path:
     if not weekends:
         raise ValueError(f"No sessions match track={track_slug} car={car_slug}")
 
-    per_weekend: list[tuple[str, list[_SessionDigest]]] = []
+    weekend_entries: list[tuple[str, list[dict]]] = []
     for wid in weekends:
         entries = sessions_for(track_slug=track_slug, car_slug=car_slug, weekend_id=wid)
         entries.sort(key=lambda e: e.get("start_time_utc") or "")
-        per_weekend.append((wid, [_digest(e["session_id"], track) for e in entries]))
+        weekend_entries.append((wid, entries))
+
+    with progress_section(
+        f"Progression — digesting {len(weekend_entries)} weekend(s)",
+        total=len(weekend_entries),
+    ) as p:
+        digested = _parallel_map(
+            lambda we: (we[0], [_digest(e["session_id"], track, car) for e in we[1]]),
+            weekend_entries,
+            on_complete=p.advance,
+        )
+    per_weekend: list[tuple[str, list[_SessionDigest]]] = list(digested)
 
     out_dir = report_dir_for(track_slug, car_slug)
     out_path = out_dir / "progression.md"
@@ -981,19 +1101,39 @@ class _WeekendDigest:
     can_dropout_flagged_laps: int
 
 
-def _digest_weekend(track: TrackRef, weekend_id: str, entries: list[dict]) -> _WeekendDigest:
-    """Build a :class:`_WeekendDigest` from all sessions in one weekend."""
-    session_digests = [_digest(e["session_id"], track) for e in entries]
+def _digest_weekend(track: TrackRef, weekend_id: str, entries: list[dict], car: CarRef | None = None) -> _WeekendDigest:
+    """Build a :class:`_WeekendDigest` from all sessions in one weekend.
 
-    # Per-lap metrics across the whole weekend so we can compute weekend-level optima.
+    Parallelism strategy: this function is itself often called in parallel across
+    several weekends (see ``write_weekend_comparison_report`` / ``write_coaching_inputs``),
+    so we *don't* parallelize across sessions inside one weekend — that would multiply
+    thread count to the point of contention. We do parallelize across the on-pace laps
+    of a single session, where the bulk pandas/numpy work releases the GIL.
+    """
+    # Load each session's df exactly once; reuse it for both the digest and the
+    # per-lap metric pass (the prior code loaded each parquet twice).
+    sessions_loaded: list[tuple[dict, pd.DataFrame, list[Lap]]] = []
+    for e in entries:
+        df_local = load_session_df(e["session_id"])
+        laps_local = detect_laps(df_local)
+        classify_outliers(laps_local)
+        sessions_loaded.append((e, df_local, laps_local))
+
+    session_digests: list[_SessionDigest] = []
+    for e, df_local, laps_local in sessions_loaded:
+        sd = _digest(e["session_id"], track, car, df=df_local, laps=laps_local)
+        session_digests.append(sd)
+
     all_lap_records: list[tuple[_SessionDigest, Lap, LapMetrics]] = []
     can_dropout_flagged = 0
-    for sd in session_digests:
-        df = load_session_df(sd.meta.session_id)
-        laps_full = detect_laps(df)
-        classify_outliers(laps_full)
-        for lap in on_pace(laps_full):
-            lm = compute_lap_metrics(lap, df, track)
+    for sd, (_, df_local, laps_local) in zip(session_digests, sessions_loaded):
+        calibrated_local = _session_calibrated_boundaries(df_local, car)
+        on_pace_laps = list(on_pace(laps_local))
+        lm_list = _parallel_map(
+            lambda lap: compute_lap_metrics(lap, df_local, track, car, gear_boundaries_override=calibrated_local),
+            on_pace_laps,
+        )
+        for lap, lm in zip(on_pace_laps, lm_list):
             if lm.can_dropout_flag:
                 can_dropout_flagged += 1
             all_lap_records.append((sd, lap, lm))
@@ -1094,10 +1234,22 @@ def write_weekend_comparison_report(track_slug: str, car_slug: str, weekend_id: 
     if not all_wids:
         raise ValueError(f"No weekends found for {track_slug}/{car_slug}")
 
-    digests: dict[str, _WeekendDigest] = {}
-    for wid in all_wids:
-        entries = sessions_for(track_slug=track_slug, car_slug=car_slug, weekend_id=wid)
-        digests[wid] = _digest_weekend(track, wid, entries)
+    # Each weekend's digest is independent and slow (it loads parquets, computes per-lap
+    # metrics across all on-pace laps in that weekend) — run them in parallel.
+    weekend_entries = [
+        (wid, sessions_for(track_slug=track_slug, car_slug=car_slug, weekend_id=wid))
+        for wid in all_wids
+    ]
+    with progress_section(
+        f"Compare — {weekend_id}: digesting {len(weekend_entries)} weekend(s)",
+        total=len(weekend_entries),
+    ) as p:
+        digest_results = _parallel_map(
+            lambda we: (we[0], _digest_weekend(track, we[0], we[1], car)),
+            weekend_entries,
+            on_complete=p.advance,
+        )
+    digests: dict[str, _WeekendDigest] = dict(digest_results)
 
     # Order: chronological by earliest_start_utc, then ensure this weekend is last for narrative purposes.
     ordered = sorted(digests.values(), key=lambda d: d.earliest_start_utc or "")
@@ -1112,6 +1264,309 @@ def write_weekend_comparison_report(track_slug: str, car_slug: str, weekend_id: 
     md = _render_comparison_report(track, car, this_w, priors, all_ordered=ordered)
     out_path.write_text(md, encoding="utf-8")
     return out_path
+
+
+def write_coaching_inputs(track_slug: str, car_slug: str, weekend_id: str) -> Path:
+    """Render the lean structured `coaching_inputs_<weekend>.md`.
+
+    This is the single source for the coaching writeup. Every number cites a
+    source lap/weekend so the coaching writer cannot invent optima.
+    """
+    track = find_track(track_slug)
+    car = find_car(car_slug)
+
+    all_wids = weekend_ids(track_slug=track_slug, car_slug=car_slug)
+    if weekend_id not in all_wids:
+        raise ValueError(f"Weekend {weekend_id} has no sessions for {track_slug}/{car_slug}")
+
+    weekend_entries = [
+        (wid, sessions_for(track_slug=track_slug, car_slug=car_slug, weekend_id=wid))
+        for wid in all_wids
+    ]
+    with progress_section(
+        f"Coaching inputs — {weekend_id}: digesting {len(weekend_entries)} weekend(s)",
+        total=len(weekend_entries),
+    ) as p:
+        digest_results = _parallel_map(
+            lambda we: (we[0], _digest_weekend(track, we[0], we[1], car)),
+            weekend_entries,
+            on_complete=p.advance,
+        )
+    digests: dict[str, _WeekendDigest] = dict(digest_results)
+    ordered = sorted(digests.values(), key=lambda d: d.earliest_start_utc or "")
+    this_w = digests[weekend_id]
+    priors = [d for d in ordered if d.weekend_id != weekend_id]
+
+    out_dir = report_dir_for(track_slug, car_slug)
+    out_path = out_dir / f"coaching_inputs_{weekend_id}.md"
+    with status_line("Rendering coaching_inputs markdown"):
+        md = _render_coaching_inputs(track, car, this_w, priors, ordered)
+        out_path.write_text(md, encoding="utf-8")
+    return out_path
+
+
+def _all_time_best_apex_per_turn(weekends: list[_WeekendDigest]) -> dict[str, tuple[float, str, str]]:
+    """For each turn number, return (best_apex_mph, weekend_id, lap_label) from each
+    weekend's *best* lap. Picks the maximum apex speed across all weekends' best laps.
+    """
+    out: dict[str, tuple[float, str, str]] = {}
+    for w in weekends:
+        if w.best_lap_metrics is None:
+            continue
+        for p in w.best_lap_metrics.passages:
+            mph = p.speed_at_apex_mps * 2.2369363 if np.isfinite(p.speed_at_apex_mps) else float("nan")
+            if not np.isfinite(mph):
+                continue
+            prev = out.get(p.turn_number)
+            if prev is None or mph > prev[0]:
+                out[p.turn_number] = (float(mph), w.weekend_id, w.best_lap_session_label)
+    return out
+
+
+def _passage_by_turn(metrics: LapMetrics | None) -> dict[str, TurnPassage]:
+    return {p.turn_number: p for p in (metrics.passages if metrics else [])}
+
+
+def _fmt_or_dash(v: float | int | None, spec: str = ".0f") -> str:
+    if v is None:
+        return "—"
+    try:
+        f = float(v)
+        if not np.isfinite(f):
+            return "—"
+        return format(f, spec)
+    except (TypeError, ValueError):
+        return "—"
+
+
+def _render_coaching_inputs(
+    track: TrackRef,
+    car: CarRef,
+    this_w: _WeekendDigest,
+    priors: list[_WeekendDigest],
+    ordered: list[_WeekendDigest],
+) -> str:
+    # Build session-label → YYYY-MM-DD mapping so all lap citations use the date
+    # rather than the internal session-name label. The driver thinks in calendar
+    # dates, not in label slugs like "session_0920".
+    label_to_date: dict[str, str] = {}
+    for w in ordered:
+        for sd in w.sessions:
+            label = sd.meta.session_label or sd.meta.session_id
+            if sd.meta.start_time_utc:
+                try:
+                    dt = datetime.fromisoformat(sd.meta.start_time_utc.replace("Z", "+00:00"))
+                    label_to_date[label] = dt.strftime("%Y-%m-%d")
+                except (ValueError, TypeError):
+                    label_to_date[label] = label
+            else:
+                label_to_date[label] = label
+
+    def to_date(label: str) -> str:
+        return label_to_date.get(label, label)
+
+    def fix_source_label(s: str) -> str:
+        """Replace '@<session_label>' with '@<date>' in a source-citation string."""
+        for label, date in label_to_date.items():
+            s = s.replace(f"@{label}", f"@{date}")
+        return s
+
+    L: list[str] = []
+    L.append(f"# Coaching inputs — {track.title} — {car.title} — `{this_w.weekend_id}`")
+    L.append("")
+    L.append("Auto-generated. Every value below cites a source lap/weekend; do not infer or invent optima beyond what's listed here.")
+    L.append("")
+
+    # ---- 1. Weekend facts ---------------------------------------------------
+    L.append("## 1. Weekend facts")
+    L.append("")
+    L.append("| Metric | Value | Source |")
+    L.append("|---|---|---|")
+    if np.isfinite(this_w.best_lap_s):
+        L.append(f"| Weekend best lap | **{this_w.best_lap_str}** | {to_date(this_w.best_lap_session_label)} ({this_w.best_lap_day}) |")
+    if np.isfinite(this_w.optimal_lap_s):
+        gap = this_w.best_lap_s - this_w.optimal_lap_s
+        L.append(f"| Weekend optimum | {format_lap_time(this_w.optimal_lap_s)} | sum of sector bests (Section 3) |")
+        L.append(f"| Gap to weekend optimum | {gap * 1000:+.0f} ms | — |")
+    # vs prior weekend (most recent prior)
+    prev = priors[-1] if priors else None
+    if prev and np.isfinite(prev.best_lap_s) and np.isfinite(this_w.best_lap_s):
+        d = this_w.best_lap_s - prev.best_lap_s
+        L.append(f"| Best vs prior weekend ({prev.weekend_id}) | {d:+.3f}s vs {prev.best_lap_str} | prior {to_date(prev.best_lap_session_label)} |")
+    # vs series best lap (excluding this weekend)
+    series_best = min((w for w in priors if np.isfinite(w.best_lap_s)), key=lambda w: w.best_lap_s, default=None)
+    if series_best and np.isfinite(this_w.best_lap_s):
+        d = this_w.best_lap_s - series_best.best_lap_s
+        marker = " **(new series best)**" if d < 0 else ""
+        L.append(f"| Best vs prior series best | {d:+.3f}s vs {series_best.best_lap_str}{marker} | {to_date(series_best.best_lap_session_label)} |")
+    # vs series-best optimum (across all weekends including this one)
+    opt_winner = min((w for w in ordered if np.isfinite(w.optimal_lap_s)), key=lambda w: w.optimal_lap_s, default=None)
+    if opt_winner and np.isfinite(this_w.optimal_lap_s):
+        d = this_w.optimal_lap_s - opt_winner.optimal_lap_s
+        own = "this weekend" if opt_winner.weekend_id == this_w.weekend_id else opt_winner.weekend_id
+        L.append(f"| Optimum vs series-best optimum | {d:+.3f}s vs {format_lap_time(opt_winner.optimal_lap_s)} | owned by {own} |")
+    L.append("")
+
+    # ---- 2. Conditions ------------------------------------------------------
+    L.append("## 2. Conditions (per session)")
+    L.append("")
+    L.append("Precipitation values are from the gridded Open-Meteo model and are known to miss localized convective rain. Cross-check against ASOS METAR from the nearest airport when wet conditions are suspected — do not assume `precip=0` means the track was dry.")
+    L.append("")
+    L.append("| Date | Day | Start (UTC) | Temp (°F) | Wind (mph) | Cloud | Precip (mm, model) |")
+    L.append("|---|---|---|---|---|---|---|")
+    for sd in this_w.sessions:
+        m = sd.meta
+        w = WeatherSnapshot(**m.weather) if m.weather else None
+        temp_f = (w.temperature_c * 9 / 5 + 32) if (w and w.temperature_c is not None) else None
+        wind_mph = (w.wind_speed_kmh * 0.621371) if (w and w.wind_speed_kmh is not None) else None
+        cloud = w.cloud_cover_pct if (w and w.cloud_cover_pct is not None) else None
+        precip = w.precipitation_mm if (w and w.precipitation_mm is not None) else None
+        # Compact ISO timestamp → "YYYY-MM-DD HH:MM UTC"; tz-conversion left to the
+        # coaching writer since the UTC value is the source of truth in storage.
+        start = "—"
+        if m.start_time_utc:
+            try:
+                dt = datetime.fromisoformat(m.start_time_utc.replace("Z", "+00:00"))
+                start = dt.strftime("%Y-%m-%d %H:%M UTC")
+            except (ValueError, TypeError):
+                start = m.start_time_utc
+        label = m.session_label or m.session_id
+        L.append(
+            f"| {to_date(label)} | {m.day_of_weekend} | {start} | "
+            f"{_fmt_or_dash(temp_f, '.0f')} | {_fmt_or_dash(wind_mph, '.1f')} | "
+            f"{_fmt_or_dash(cloud, '.0f')}% | {_fmt_or_dash(precip, '.1f')} |"
+        )
+    L.append("")
+
+    # ---- 3. Sector bests this weekend --------------------------------------
+    L.append("## 3. Sector bests this weekend (with source lap)")
+    L.append("")
+    L.append("| # | Sector | Time (s) | Source |")
+    L.append("|---|---|---|---|")
+    for num in sorted(this_w.sector_best_s.keys()):
+        L.append(
+            f"| {num} | {this_w.sector_names.get(num, '—')} | "
+            f"{this_w.sector_best_s[num]:.3f} | {fix_source_label(this_w.sector_best_source.get(num, '—'))} |"
+        )
+    if np.isfinite(this_w.optimal_lap_s):
+        L.append(f"| | **Total (weekend optimum)** | **{format_lap_time(this_w.optimal_lap_s)}** | sum |")
+    L.append("")
+
+    # ---- 4. Cross-weekend sector bests -------------------------------------
+    L.append("## 4. Cross-weekend sector bests (all weekends, with all-time owner)")
+    L.append("")
+    sector_nums = sorted({n for w in ordered for n in w.sector_best_s.keys()})
+    header = "| # | Sector |" + "".join(f" {w.weekend_id} |" for w in ordered) + " All-time best (s) | Owner |"
+    L.append(header)
+    L.append("|" + "---|" * (3 + len(ordered)))
+    for num in sector_nums:
+        name = this_w.sector_names.get(num) or next(
+            (w.sector_names.get(num) for w in ordered if w.sector_names.get(num)), "—"
+        )
+        per_weekend = []
+        all_time: tuple[float, str] | None = None
+        for w in ordered:
+            v = w.sector_best_s.get(num)
+            per_weekend.append(f"{v:.3f}" if v is not None and np.isfinite(v) else "—")
+            if v is not None and np.isfinite(v) and (all_time is None or v < all_time[0]):
+                all_time = (float(v), w.weekend_id)
+        all_time_str = f"{all_time[0]:.3f}" if all_time else "—"
+        owner = all_time[1] if all_time else "—"
+        L.append(f"| {num} | {name} | " + " | ".join(per_weekend) + f" | **{all_time_str}** | {owner} |")
+    L.append("")
+
+    # ---- 5. Vs prior weekend — sector delta --------------------------------
+    if prev:
+        L.append(f"## 5. Vs prior weekend ({prev.weekend_id}) — sector delta")
+        L.append("")
+        L.append("| # | Sector | This (s) | Prior (s) | Δ s | Direction |")
+        L.append("|---|---|---|---|---|---|")
+        for num in sector_nums:
+            t = this_w.sector_best_s.get(num)
+            p = prev.sector_best_s.get(num)
+            if t is None or p is None or not (np.isfinite(t) and np.isfinite(p)):
+                continue
+            d = t - p
+            arrow = "↑" if d < -0.001 else ("↓" if d > 0.001 else "—")
+            L.append(f"| {num} | {this_w.sector_names.get(num, '—')} | {t:.3f} | {p:.3f} | {d:+.3f} | {arrow} |")
+        L.append("")
+
+    # ---- 6. Per-corner apex-speed comparison: this best vs all-time best ----
+    L.append("## 6. Per-corner apex-speed gap — this weekend's best lap vs all-time best apex at each turn")
+    L.append("")
+    L.append("Sorted by deficit (largest negative Δ first). The 'all-time best apex' is the highest apex speed for that turn across the best lap of every recorded weekend (including this one).")
+    L.append("")
+    all_time_apex = _all_time_best_apex_per_turn(ordered)
+    this_passages = _passage_by_turn(this_w.best_lap_metrics)
+    rows: list[tuple[str, float, float, float, str, str]] = []
+    for tnum in sorted(this_passages.keys(), key=lambda x: (int("".join(c for c in x if c.isdigit()) or 0), x)):
+        p = this_passages[tnum]
+        this_mph = p.speed_at_apex_mps * 2.2369363 if np.isfinite(p.speed_at_apex_mps) else float("nan")
+        at = all_time_apex.get(tnum)
+        if at is None or not np.isfinite(this_mph):
+            continue
+        delta = this_mph - at[0]
+        this_src = to_date(this_w.best_lap_session_label)
+        at_src = f"{at[1]} {to_date(at[2])}"
+        rows.append((tnum, this_mph, at[0], delta, this_src, at_src))
+    rows.sort(key=lambda r: r[3])  # most-negative first
+    deficits = [r for r in rows if r[3] < -0.05]
+    owned = [r for r in rows if r[3] >= -0.05]
+    L.append("**Corners with apex-speed deficit vs all-time best** (largest first):")
+    L.append("")
+    L.append("| Turn | This best apex (mph) | All-time best apex (mph) | Δ mph | This lap | All-time source |")
+    L.append("|---|---|---|---|---|---|")
+    for tnum, this_mph, at_mph, delta, this_src, at_src in deficits:
+        L.append(f"| {tnum} | {this_mph:.1f} | {at_mph:.1f} | {delta:+.1f} | {this_src} | {at_src} |")
+    L.append("")
+    if owned:
+        owned_list = ", ".join(f"T{r[0]} ({r[1]:.1f} mph)" for r in sorted(owned, key=lambda r: -r[1]))
+        L.append(f"**Corners at or above all-time-best apex** (this weekend owns the apex): {owned_list}")
+        L.append("")
+
+    # ---- 7. Per-corner technique deltas (top deficits) ---------------------
+    L.append("## 7. Per-corner technique signature — this weekend's best lap vs all-time best lap")
+    L.append("")
+    L.append("For the top deficits from Section 6: technique signature on this weekend's best lap, side-by-side with the technique on the all-time-best-lap *at the same corner* (sourced from the weekend whose best lap held the highest apex at that turn). Only entries where the all-time source is a different weekend are shown — a corner where this weekend owns the apex needs no comparison.")
+    L.append("")
+    # Pre-cache best-lap passages by weekend for the comparison
+    weekend_best_passages: dict[str, dict[str, TurnPassage]] = {
+        w.weekend_id: _passage_by_turn(w.best_lap_metrics) for w in ordered
+    }
+    top_deficit_rows = [r for r in rows if r[3] < -0.5][:8]
+    if not top_deficit_rows:
+        L.append("_No corner shows a meaningful (> 0.5 mph) apex-speed deficit vs the all-time best._")
+    for tnum, this_mph, at_mph, delta, this_src, at_src in top_deficit_rows:
+        at_wid = all_time_apex[tnum][1]
+        if at_wid == this_w.weekend_id:
+            continue
+        this_p = this_passages[tnum]
+        at_p = weekend_best_passages.get(at_wid, {}).get(tnum)
+        if at_p is None:
+            continue
+        L.append(f"### T{tnum} — {this_p.turn_name} (apex Δ {delta:+.1f} mph)")
+        L.append("")
+        L.append(f"| Metric | This best ({this_src}, {this_w.best_lap_str}) | All-time best ({at_src}) |")
+        L.append("|---|---|---|")
+        L.append(f"| Apex mph | {this_mph:.1f} | {at_mph:.1f} |")
+        L.append(f"| Apex style | {this_p.apex_style} | {at_p.apex_style} |")
+        L.append(f"| Brake onset (m before apex) | {_fmt_or_dash(this_p.brake_onset_m_before_apex, '.1f')} | {_fmt_or_dash(at_p.brake_onset_m_before_apex, '.1f')} |")
+        L.append(f"| Brake max (%) | {_fmt_or_dash(this_p.brake_max_pct, '.0f')} | {_fmt_or_dash(at_p.brake_max_pct, '.0f')} |")
+        L.append(f"| Trail past apex (m) | {_fmt_or_dash(this_p.trail_brake_past_apex_m, '.1f')} | {_fmt_or_dash(at_p.trail_brake_past_apex_m, '.1f')} |")
+        L.append(f"| Throttle@apex (%) | {_fmt_or_dash(this_p.throttle_at_apex_pct, '.0f')} | {_fmt_or_dash(at_p.throttle_at_apex_pct, '.0f')} |")
+        L.append(f"| Throttle pickup (m after apex) | {_fmt_or_dash(this_p.throttle_onset_m_after_apex, '.1f')} | {_fmt_or_dash(at_p.throttle_onset_m_after_apex, '.1f')} |")
+        L.append(f"| Peak latG | {_fmt_or_dash(this_p.peak_lateral_g, '.2f')} | {_fmt_or_dash(at_p.peak_lateral_g, '.2f')} |")
+        L.append(f"| Gear (entry→apex) | {this_p.gear_entry or '—'}→{this_p.gear_at_apex or '—'} | {at_p.gear_entry or '—'}→{at_p.gear_at_apex or '—'} |")
+        L.append("")
+
+    # ---- 8. CAN-dropout flagged laps ---------------------------------------
+    if this_w.can_dropout_flagged_laps:
+        L.append("## 8. Data-quality — CAN dropout laps")
+        L.append("")
+        L.append(f"{this_w.can_dropout_flagged_laps} lap(s) this weekend had ≥25% CAN-bus dropout. Lap times and GPS are valid for these laps; brake/throttle/RPM-derived metrics on them are unreliable and should not be used in technique analysis. See the relevant session report for per-lap detail.")
+        L.append("")
+
+    return "\n".join(L) + "\n"
 
 
 def _render_comparison_report(
